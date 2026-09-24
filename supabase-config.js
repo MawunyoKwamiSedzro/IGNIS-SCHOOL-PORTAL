@@ -4,10 +4,13 @@ window.IGNIS_SUPABASE_CONFIG = {
     anonKey: 'sb_publishable_4Pwm_MhR9PhszRqJv8riWw_Ym5lz5S7'
 };
 
-window.ignisSupabase = (() => {
-    const { url, anonKey } = window.IGNIS_SUPABASE_CONFIG;
-    if (!url || !anonKey || !window.supabase?.createClient) {
-        return { client: null, error: 'Supabase settings are missing. Follow supabase/SETUP.md.' };
-    }
-    return { client: window.supabase.createClient(url, anonKey), error: null };
-})();
+if (!window.IGNIS_SUPABASE_CONFIG.url || !window.IGNIS_SUPABASE_CONFIG.anonKey) {
+    window.ignisSupabase = { client: null, error: 'Supabase settings are missing. Follow supabase/SETUP.md.' };
+} else if (!window.supabase?.createClient) {
+    window.ignisSupabase = { client: null, error: 'The Supabase browser library did not load. Refresh the page or check network access to jsDelivr.' };
+} else {
+    window.ignisSupabase = {
+        client: window.supabase.createClient(window.IGNIS_SUPABASE_CONFIG.url, window.IGNIS_SUPABASE_CONFIG.anonKey),
+        error: null
+    };
+}
