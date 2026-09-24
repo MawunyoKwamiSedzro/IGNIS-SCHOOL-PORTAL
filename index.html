@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102f3a">
+  <title>IGNIS School Portal — Sign in</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js" defer></script>
+  <script src="auth.js" defer></script>
+</head>
+<body>
+  <main class="login-wrap">
+    <section class="login-brand">
+      <div class="login-crest">I</div>
+      <p class="eyebrow">IGNIS School · Nsawam, Ghana</p>
+      <h1>Excellence with<br>purpose.</h1>
+      <p>One secure place for learning, care, communication, and accountable school operations.</p>
+      <div class="login-note">
+        <b>Protected school information</b>
+        <span>Secure sign-in · School role permissions</span>
+      </div>
+    </section>
+    <section class="login-panel">
+      <form id="loginForm" class="login-card">
+        <div class="login-mobile-mark">I</div>
+        <p class="eyebrow">Secure access</p>
+        <h2>Welcome to IGNIS</h2>
+        <p>Sign in to continue to the School Portal.</p>
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" placeholder="name@ignisschool.edu.gh" required>
+        <label for="password">Password</label>
+        <div class="password-field">
+          <input name="password" id="password" type="password" placeholder="Enter your password" required>
+          <button type="button" id="togglePassword">Show</button>
+        </div>
+        <div class="login-options">
+          <button type="button" id="forgotPassword">Forgot password?</button>
+        </div>
+        <button class="primary login-button" type="submit">Sign in securely</button>
+        <p id="loginError" class="login-error" role="alert"></p>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
