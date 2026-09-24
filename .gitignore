@@ -1,3 +1,6 @@
+# IGNIS School Secrets - DO NOT PUSH
+supabase-config.js
+supabase/config.toml
 # Logs
 logs
 *.log
