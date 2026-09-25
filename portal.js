@@ -164,8 +164,8 @@ if (!session) {
 
     let checkins = storage.get('ignis-checkins', []);
     let staffAttendance = storage.get('ignis-staff-attendance', {});
-    let attendancePolicy = storage.get('ignis-attendance-policy', { arrivalBy: '08:00' });
-    let currentTerm = storage.get('ignis-current-term', 'Term not configured');
+    let attendancePolicy = storage.get('ignis-attendance-policy', { arrivalBy: '' });
+    let currentTerm = storage.get('ignis-current-term', 'Not configured');
 
     const localDateKey = date => {
         const value = date || new Date();
@@ -214,7 +214,7 @@ if (!session) {
             .slice(-1)[0];
 
     const isLateArrival = timestamp => {
-        const [hours, minutes] = String(attendancePolicy.arrivalBy || '08:00').split(':').map(Number);
+        if (!attendancePolicy.arrivalBy) return false; const [hours, minutes] = String(attendancePolicy.arrivalBy).split(':').map(Number);
         const cutoff = new Date(timestamp);
         cutoff.setHours(hours, minutes, 0, 0);
         return new Date(timestamp) > cutoff;
@@ -542,7 +542,7 @@ if (!session) {
                                 ? `${new Date(mine.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                    · ${mine.zoneName}, ${Math.round(mine.distance)}m from centre
                                    ${mine.verified ? '(within the ' + mine.radius + 'm boundary)' : '(outside the ' + mine.radius + 'm boundary)'}`
-                                : `Your location is checked against the approved school zones when you tap the button. Arrive by ${attendancePolicy.arrivalBy} to be marked on time.`
+                                : `Your location is checked against the approved school zones when you tap the button. ${attendancePolicy.arrivalBy ? `Arrive by ${attendancePolicy.arrivalBy} to be marked on time.` : 'The school has not set an arrival time yet.'}`
                         }</p>
                     </div>
                     ${mine?.verified ? '<span class="pill green">Verified on-site</span>' : button('Verify &amp; clock in', 'clockIn()')}
@@ -688,7 +688,7 @@ if (!session) {
                                             ? students.filter(s => s[2] === c.name).map(s => `<button class="link roster-link" onclick="studentProfile('${s[0]}')"><b>${s[1]}</b><small>${s[0]} · ${s[3]}</small></button>`).join('')
                                             : '<small class="subline">No students enrolled yet.</small>'}
                                     </div>
-                                    ${(isTeacher || isAdmin) ? `<button class="secondary" onclick="openRegister('${c.id}')">${isAdmin ? 'View daily register' : 'Open daily register'}</button>` : ''}${isAdmin ? `<button class="link danger-link" onclick="deleteClass('${c.id}')">Delete class</button>` : ''}
+                                    ${(isTeacher || isAdmin) ? `<button class="secondary" onclick="openRegister('${c.id}')">${isAdmin ? 'View daily register' : 'Open daily register'}</button>` : ''}${isAdmin ? `<button class="link danger-link" onclick="deleteClass('${c.id}')">Delete class</button>` : ''}${attendancePolicy.arrivalBy ? `Arrive by ${attendancePolicy.arrivalBy} to be marked on time.` : 'The school has not set an arrival time yet.'}
                                 </div>
                             `
                         )
@@ -852,7 +852,7 @@ if (!session) {
                                         </div>
                                         <div class="payment-directory" aria-label="School payment directory">
                                             <span>Receive money at</span>
-                                            <b>${paymentSettings.accountName || 'IGNIS School'}</b>
+                                            <b>${paymentSettings.accountName || 'School account name not set'}</b>
                                             <span class="directory-line mtn">MTN MoMo: ${paymentSettings.mtnNumber || 'Not configured'}</span>
                                             <span class="directory-line telecel">Telecel Cash: ${paymentSettings.telecelNumber || 'Not configured'}</span>
                                         </div>
@@ -1072,7 +1072,7 @@ if (!session) {
 
         settings: () => heading('School settings', 'Set the current academic term and operational defaults.') + `
             <div class="card settings-card"><form id="schoolTermForm" onsubmit="saveSchoolTerm(event)">
-                <div class="field"><label for="currentTermInput">Current academic term</label><input id="currentTermInput" name="term" value="${currentTerm === 'Term not configured' ? '' : currentTerm}" placeholder="e.g. First Term 2026/27" required></div>
+                <div class="field"><label for="currentTermInput">Current academic term</label><input id="currentTermInput" name="term" value="${currentTerm === 'Not configured' ? '' : currentTerm}" placeholder="Enter the current term and academic year" required></div>
                 <button class="primary" type="submit">Save school settings</button>
             </form><p class="subline">Attendance arrival time and approved locations are configured from the Staff attendance page.</p></div>
         `,
@@ -1567,7 +1567,7 @@ if (!session) {
             <h2 id="modalTitle">Teacher arrival policy</h2>
             <p class="subline">A verified check-in after this time is recorded as late. The time uses the device’s local time.</p>
             <form id="attendancePolicyForm">
-                <div class="field"><label for="arrivalBy">Expected arrival time</label><input id="arrivalBy" name="arrivalBy" type="time" value="${attendancePolicy.arrivalBy || '08:00'}" required></div>
+                <div class="field"><label for="arrivalBy">Expected arrival time</label><input id="arrivalBy" name="arrivalBy" type="time" value="${attendancePolicy.arrivalBy || ''}" required></div>
                 <button class="primary" type="submit" style="width:100%">Save arrival policy</button>
             </form>
         `);
@@ -1993,7 +1993,7 @@ if (!session) {
                 </div>
                 <div class="field">
                     <label>Term</label>
-                    <input name="term" placeholder="e.g. First Term 2026/27" required>
+                    <input name="term" placeholder="Enter the current term and academic year" required>
                 </div>
                 <div class="form-row" style="display:flex;gap:10px">
                     <div class="field" style="flex:1">
