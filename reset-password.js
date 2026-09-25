@@ -28,7 +28,8 @@ function showExpiredLinkMessage() {
 }
 
 const query = new URLSearchParams(location.search);
-if (query.has('error') || query.has('error_code') || new URLSearchParams(location.hash.slice(1)).has('error') || new URLSearchParams(location.hash.slice(1)).has('error_code')) {
+const hash = new URLSearchParams(location.hash.slice(1));
+if (query.has('error') || query.has('error_code') || hash.has('error') || hash.has('error_code')) {
     showExpiredLinkMessage();
 }
 
@@ -50,21 +51,26 @@ resetForm.addEventListener('submit', async event => {
     }
 
     saveButton.disabled = true;
-    const { data: { session }, error: sessionError } = await client.auth.getSession();
-    if (sessionError || !session) {
-        resetMessage.textContent = 'Your password link is invalid or expired. Return to sign in and choose “Forgot password?” to request a fresh link.';
-        requestFreshLink.hidden = false;
-        saveButton.disabled = false;
-        return;
-    }
+    try {
+        const { data: { session }, error: sessionError } = await client.auth.getSession();
+        if (sessionError || !session) {
+            resetMessage.textContent = 'Your password link is invalid or expired. Return to sign in and choose “Forgot password?” to request a fresh link.';
+            requestFreshLink.hidden = false;
+            return;
+        }
 
-    const { error } = await client.auth.updateUser({ password });
-    if (error) {
-        resetMessage.textContent = error.message;
+        const { error } = await client.auth.updateUser({ password });
+        if (error) {
+            resetMessage.textContent = error.message;
+            requestFreshLink.hidden = false;
+            return;
+        }
+        resetMessage.textContent = 'Password updated. You can now sign in.';
+        setTimeout(() => location.replace('index.html'), 1200);
+    } catch (error) {
+        resetMessage.textContent = error.message || 'Could not update your password. Check your connection and try again.';
         requestFreshLink.hidden = false;
+    } finally {
         saveButton.disabled = false;
-        return;
     }
-    resetMessage.textContent = 'Password updated. You can now sign in.';
-    setTimeout(() => location.replace('index.html'), 1200);
 });
