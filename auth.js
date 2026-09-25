@@ -3,7 +3,7 @@ const form = document.getElementById('loginForm');
 const passwordInput = document.getElementById('password');
 const togglePassword = document.getElementById('togglePassword');
 const forgotPassword = document.getElementById('forgotPassword');
-const loginError = document.getElementById('loginError');
+const loginError = document.getElementById('loginError'); const authLinkType = new URLSearchParams(location.hash.slice(1)).get('type'); if (['invite', 'recovery'].includes(authLinkType)) { const resetUrl = new URL('reset-password.html', location.href); resetUrl.hash = location.hash; location.replace(resetUrl.href); }
 
 const showError = message => {
     loginError.textContent = message;
