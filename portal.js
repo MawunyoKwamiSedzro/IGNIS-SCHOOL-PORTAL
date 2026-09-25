@@ -1568,7 +1568,7 @@ if (!session) {
             <p class="subline">A verified check-in after this time is recorded as late. The time uses the device’s local time.</p>
             <form id="attendancePolicyForm">
                 <div class="field"><label for="arrivalBy">Expected arrival time</label><input id="arrivalBy" name="arrivalBy" type="time" value="${attendancePolicy.arrivalBy || '08:00'}" required></div>
-                <button class="primary" type="submit" style="width:100%">Save arrival policy</button>
+                <div class="field"><label>Class for a new Student account</label><select name="studentClassId"><option value="">Choose class</option>${classesData.map(cls => '<option value="' + cls.id + '">' + cls.name + '</option>').join('')}</select></div><button class="primary" type="submit" style="width:100%">Save arrival policy</button>
             </form>
         `);
         document.getElementById('attendancePolicyForm').onsubmit = async event => {
@@ -1634,7 +1634,7 @@ if (!session) {
                         <input name="guardianEmail" type="email" placeholder="guardian@email.com" autocomplete="email">
                     </div>
                 </div>
-                <button class="primary" type="submit" style="width:100%">Enrol student</button>
+                <div class="field"><label>Class for a new Student account</label><select name="studentClassId"><option value="">Choose class</option>${classesData.map(cls => '<option value="' + cls.id + '">' + cls.name + '</option>').join('')}</select></div><button class="primary" type="submit" style="width:100%">Enrol student</button>
             </form>
         `);
 
@@ -1739,7 +1739,7 @@ if (!session) {
                     <label>Teacher in charge</label>
                     <select name="teacher_user_id"><option value="">Unassigned</option>${staffMembers().map(person => `<option value="${person.user_id}">${person.name}</option>`).join('')}</select>
                 </div>
-                <button class="primary" type="submit" style="width:100%">Add class</button>
+                <div class="field"><label>Class for a new Student account</label><select name="studentClassId"><option value="">Choose class</option>${classesData.map(cls => '<option value="' + cls.id + '">' + cls.name + '</option>').join('')}</select></div><button class="primary" type="submit" style="width:100%">Add class</button>
             </form>
         `);
 
@@ -1774,7 +1774,7 @@ if (!session) {
                 <div class="form-row settings-grid"><div class="field"><label>Day</label><select name="weekday"><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option></select></div><div class="field"><label>Subject</label><input name="subject" required></div></div>
                 <div class="form-row settings-grid"><div class="field"><label>Starts</label><input name="start_time" type="time" required></div><div class="field"><label>Ends</label><input name="end_time" type="time" required></div></div>
                 <div class="field"><label>Teacher</label><select name="teacher_user_id"><option value="">Unassigned</option>${staffMembers().map(person => `<option value="${person.user_id}">${person.name}</option>`).join('')}</select></div>
-                <button class="primary" type="submit" style="width:100%">Add period</button>
+                <div class="field"><label>Class for a new Student account</label><select name="studentClassId"><option value="">Choose class</option>${classesData.map(cls => '<option value="' + cls.id + '">' + cls.name + '</option>').join('')}</select></div><button class="primary" type="submit" style="width:100%">Add period</button>
             </form>
             <div class="audit"><b>${selectedClass.name}</b>${timetableData.filter(item => item.class_id === selectedClass.id).map(item => `<div class="flag"><span>${['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'][item.weekday]} ${item.start_time.slice(0,5)}–${item.end_time.slice(0,5)} · ${item.subject}</span><button class="link" onclick="removeTimetableEntry('${item.id}')">Remove</button></div>`).join('') || '<p>No periods added yet.</p>'}</div>`);
         document.getElementById('timetableEntryForm').onsubmit = async event => {
@@ -1898,7 +1898,7 @@ if (!session) {
                     <label>Due date</label>
                     <input name="due" type="date" required>
                 </div>
-                <button class="primary" type="submit" style="width:100%">Create assignment</button>
+                <div class="field"><label>Class for a new Student account</label><select name="studentClassId"><option value="">Choose class</option>${classesData.map(cls => '<option value="' + cls.id + '">' + cls.name + '</option>').join('')}</select></div><button class="primary" type="submit" style="width:100%">Create assignment</button>
             </form>
         `);
 
@@ -2005,7 +2005,7 @@ if (!session) {
                         <input name="examScore" type="number" min="0" max="70" required>
                     </div>
                 </div>
-                <button class="primary" type="submit" style="width:100%">Save score</button>
+                <div class="field"><label>Class for a new Student account</label><select name="studentClassId"><option value="">Choose class</option>${classesData.map(cls => '<option value="' + cls.id + '">' + cls.name + '</option>').join('')}</select></div><button class="primary" type="submit" style="width:100%">Save score</button>
             </form>
         `);
 
@@ -2057,7 +2057,7 @@ if (!session) {
                         <option>Cash at school</option>
                     </select>
                 </div>
-                <button class="primary" type="submit" style="width:100%">Record payment</button>
+                <div class="field"><label>Class for a new Student account</label><select name="studentClassId"><option value="">Choose class</option>${classesData.map(cls => '<option value="' + cls.id + '">' + cls.name + '</option>').join('')}</select></div><button class="primary" type="submit" style="width:100%">Record payment</button>
             </form>
         `);
 
@@ -2095,7 +2095,7 @@ if (!session) {
 
     window.setStudentFee = studentId => {
         const current = fees[studentId] || {};
-        openModal(`<h2>Set student fees</h2><p class="subline">Create or update this student’s term ledger.</p><form id="feeForm"><div class="field"><label>Term</label><input name="term" value="${current.term || ''}" required></div><div class="field"><label>Amount billed (GH₵)</label><input name="amount" type="number" min="0" step="0.01" value="${current.amount ?? ''}" required></div><div class="field"><label>Already paid (GH₵)</label><input name="paid" type="number" min="0" step="0.01" value="${current.paid ?? 0}" required></div><button class="primary" type="submit" style="width:100%">Save fee ledger</button></form>`);
+        openModal(`<h2>Set student fees</h2><p class="subline">Create or update this student’s term ledger.</p><form id="feeForm"><div class="field"><label>Term</label><input name="term" value="${current.term || ''}" required></div><div class="field"><label>Amount billed (GH₵)</label><input name="amount" type="number" min="0" step="0.01" value="${current.amount ?? ''}" required></div><div class="field"><label>Already paid (GH₵)</label><input name="paid" type="number" min="0" step="0.01" value="${current.paid ?? 0}" required></div><div class="field"><label>Class for a new Student account</label><select name="studentClassId"><option value="">Choose class</option>${classesData.map(cls => '<option value="' + cls.id + '">' + cls.name + '</option>').join('')}</select></div><button class="primary" type="submit" style="width:100%">Save fee ledger</button></form>`);
         document.getElementById('feeForm').onsubmit = async event => {
             event.preventDefault();
             const data = new FormData(event.target);
@@ -2139,7 +2139,7 @@ if (!session) {
                         <option value="Staff">Staff only</option>
                     </select>
                 </div>
-                <button class="primary" type="submit" style="width:100%">Post notice</button>
+                <div class="field"><label>Class for a new Student account</label><select name="studentClassId"><option value="">Choose class</option>${classesData.map(cls => '<option value="' + cls.id + '">' + cls.name + '</option>').join('')}</select></div><button class="primary" type="submit" style="width:100%">Post notice</button>
             </form>
         `);
 
@@ -2193,7 +2193,7 @@ if (!session) {
                 <div class="field"><label>Role</label><select name="role"><option ${account.role === 'Teacher' ? 'selected' : ''}>Teacher</option><option ${account.role === 'Parent' ? 'selected' : ''}>Parent</option><option ${account.role === 'Student' ? 'selected' : ''}>Student</option><option ${account.role === 'Parent / Student' ? 'selected' : ''}>Parent / Student</option><option ${account.role === 'Headteacher' ? 'selected' : ''}>Headteacher</option><option ${account.role === 'Manager' ? 'selected' : ''}>Manager</option></select></div>
                 <div class="field"><label>Linked student <span class="subline">(optional for student accounts)</span></label><select name="wardId">${linkedStudentOptions(account.wardId)}</select><button class="link refresh-link" type="button" onclick="refreshLinkedStudents()">↻ Refresh enrolled students</button></div>
             </div>
-            <button class="primary" type="submit" style="width:100%">${isNew ? 'Send invitation' : 'Save account changes'}</button>
+            <div class="field"><label>Class for a new Student account</label><select name="studentClassId"><option value="">Choose class</option>${classesData.map(cls => '<option value="' + cls.id + '">' + cls.name + '</option>').join('')}</select></div><button class="primary" type="submit" style="width:100%">${isNew ? 'Send invitation' : 'Save account changes'}</button>
         </form>
     `; }
 
@@ -2202,7 +2202,7 @@ if (!session) {
         const data = new FormData(event.target);
         const email = String(data.get('email')).trim().toLowerCase();
         const role = String(data.get('role'));
-        const wardId = String(data.get('wardId') || '');
+        let wardId = String(data.get('wardId') || ''); const studentClassId = String(data.get('studentClassId') || '');
         if (['Parent', 'Parent / Student'].includes(role) && !students.some(student => student[0] === wardId)) {
             toast('Select the student this parent or student account should be linked to.');
             return;
@@ -2229,10 +2229,10 @@ if (!session) {
                 sessionStorage.setItem('ignis-session', JSON.stringify(session));
             }
         } else {
-            const { data: created, error } = await client.functions.invoke('create-user', {
+            let newStudentRecord=null;if(role==='Student'&&!wardId){const studentClass=classesData.find(item=>item.id===studentClassId);if(!studentClass){toast('Choose a class to enrol this new student.');return;}wardId='IG-'+Date.now().toString().slice(-7);const {data:savedStudent,error:studentError}=await client.from('students').insert({id:wardId,full_name:fullName,class_id:studentClass.id}).select('id,full_name,class_id').single();if(studentError){toast('Student record could not be created: '+studentError.message);return;}newStudentRecord=savedStudent;students.push([savedStudent.id,savedStudent.full_name,studentClass.name,'','','']);storage.set('ignis-students',students);} const { data: created, error } = await client.functions.invoke('create-user', {
                 body: { email, full_name: fullName, role, linked_student_id: wardId || null }
             });
-            if (error || created?.error) { toast(created?.error || error?.message || 'Invitation could not be sent.'); return; }
+            if (error || created?.error) { if(newStudentRecord){const {error:rollbackError}=await client.from('students').delete().eq('id',newStudentRecord.id);if(rollbackError){toast('Invitation failed; student cleanup failed: '+rollbackError.message);return;}students=students.filter(student=>student[0]!==newStudentRecord.id);storage.set('ignis-students',students);} toast(created?.error || error?.message || 'Invitation could not be sent.'); return; }
             userAccounts.push({ user_id: created.user_id, email, name: fullName, full_name: fullName, role, wardId: wardId || undefined, linked_student_id: wardId || null, is_active: true });
         }
         sessionStorage.setItem('ignis-user-directory', JSON.stringify(userAccounts.map(account => ({
