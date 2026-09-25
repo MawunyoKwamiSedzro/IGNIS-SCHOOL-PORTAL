@@ -19,7 +19,7 @@
             .eq('user_id', user.id)
             .single();
         if (profileError || !profile) throw new Error('Your account has no IGNIS school profile. Ask the school administrator to finish account setup.');
-        if (!profile.is_active) throw new Error('This account is disabled. Contact the school administrator.'); const cacheRecord = JSON.parse(sessionStorage.getItem('ignis-portal-cache') || 'null'); const cachedSession = JSON.parse(sessionStorage.getItem('ignis-session') || 'null'); if (cacheRecord?.userId === user.id && cachedSession?.id === user.id && Date.now() - cacheRecord.savedAt < 20000 && localStorage.getItem('ignis-students') && localStorage.getItem('ignis-classes')) { const cachedScript = document.createElement('script'); cachedScript.src = 'portal.js'; cachedScript.onerror = () => { document.body.innerHTML = '<p>IGNIS could not load. Refresh the page or contact support.</p>'; }; document.body.append(cachedScript); return; }
+        if (!profile.is_active) throw new Error('This account is disabled. Contact the school administrator.'); const cacheRecord = JSON.parse(sessionStorage.getItem('ignis-portal-cache') || 'null'); const cachedSession = JSON.parse(sessionStorage.getItem('ignis-session') || 'null'); if (cacheRecord?.userId === user.id && cachedSession?.id === user.id && Date.now() - cacheRecord.savedAt < 20000 && localStorage.getItem('ignis-students') && localStorage.getItem('ignis-classes')) { const cachedScript = document.createElement('script'); cachedScript.src = 'portal.js?v=20260925-1930'; cachedScript.onerror = () => { document.body.innerHTML = '<p>IGNIS could not load. Refresh the page or contact support.</p>'; }; document.body.append(cachedScript); return; }
 
         let directory = [];
         if (['Headteacher', 'Manager'].includes(profile.role)) {
@@ -139,7 +139,7 @@
         }));
 
         sessionStorage.setItem('ignis-portal-cache', JSON.stringify({ userId: user.id, savedAt: Date.now() })); const script = document.createElement('script');
-        script.src = 'portal.js';
+        script.src = 'portal.js?v=20260925-1930';
         script.onerror = () => { document.body.innerHTML = '<p style="padding:24px;font:16px system-ui">IGNIS could not load. Refresh the page or contact support.</p>'; };
         document.body.append(script);
     } catch (error) {
