@@ -688,7 +688,7 @@ if (!session) {
                                             ? students.filter(s => s[2] === c.name).map(s => `<button class="link roster-link" onclick="studentProfile('${s[0]}')"><b>${s[1]}</b><small>${s[0]} · ${s[3]}</small></button>`).join('')
                                             : '<small class="subline">No students enrolled yet.</small>'}
                                     </div>
-                                    ${(isTeacher || isAdmin) ? `<button class="secondary" onclick="openRegister('${c.id}')">${isAdmin ? 'View daily register' : 'Open daily register'}</button>` : ''}${isAdmin ? `<button class="link danger-link" onclick="deleteClass('${c.id}')">Delete class</button>` : ''}${attendancePolicy.arrivalBy ? `Arrive by ${attendancePolicy.arrivalBy} to be marked on time.` : 'The school has not set an arrival time yet.'}
+                                    ${(isTeacher || isAdmin) ? `<button class="secondary" onclick="openRegister('${c.id}')">${isAdmin ? 'View daily register' : 'Open daily register'}</button>` : ''}${isAdmin ? `<button class="link danger-link" onclick="deleteClass('${c.id}')">Delete class</button>` : ''}
                                 </div>
                             `
                         )
