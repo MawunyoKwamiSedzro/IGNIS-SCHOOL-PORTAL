@@ -2282,3 +2282,41 @@ if (!session) {
         toast(error ? error.message : `Password reset email sent to ${email}.`);
     };
 }
+    function attachPageSearch() {
+        const currentPage = document.body.dataset.page || 'dashboard';
+        const listTargets = {
+            classes: ['.class-card', 'Search classes, teachers, or students'],
+            assignments: ['.assignment', 'Search assignments, classes, or subjects'],
+            scores: ['.table-card', 'Search students, classes, or subjects'],
+            timetable: ['.table-wrap tbody tr', 'Search timetable periods, subjects, or teachers'],
+            fees: ['.table-card tbody tr', 'Search students, classes, or fee status'],
+            'staff-attendance': ['#staffReportTable tbody tr', 'Search staff attendance records'],
+            attendance: ['.table-card tbody tr', 'Search attendance records'],
+            announcements: ['.card > .flag', 'Search notices or message text']
+        };
+        const config = listTargets[currentPage];
+        const content = document.querySelector('.content');
+        const firstTarget = config && content?.querySelector(config[0]);
+        if (!firstTarget || content.querySelector('.page-list-search')) return;
+        const search = document.createElement('div');
+        search.className = 'search-box page-list-search';
+        search.innerHTML = '<input type="search" aria-label="Search this list" placeholder="' + config[1] + '"><button class="secondary" type="button">Search</button>';
+        const input = search.querySelector('input');
+        const filter = () => {
+            const query = input.value.trim().toLocaleLowerCase();
+            content.querySelectorAll(config[0]).forEach(item => {
+                item.hidden = Boolean(query) && !item.textContent.toLocaleLowerCase().includes(query);
+            });
+        };
+        input.addEventListener('input', filter);
+        search.querySelector('button').addEventListener('click', filter);
+        const targetCard = firstTarget.closest('.card');
+        if (targetCard) targetCard.before(search);
+        else firstTarget.before(search);
+    }
+    const pageSearchObserver = new MutationObserver(() => {
+        if (!document.querySelector('.page-list-search')) attachPageSearch();
+    });
+    pageSearchObserver.observe(document.body, { childList: true, subtree: true });
+    attachPageSearch();
+}
