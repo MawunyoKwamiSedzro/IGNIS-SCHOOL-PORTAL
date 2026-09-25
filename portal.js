@@ -2254,7 +2254,7 @@ if (!session) {
         const select = document.querySelector('select[name="wardId"]');
         if (!select && !window.ignisSupabase?.client) return;
         const selectedId = select?.value || '';
-        const client=window.ignisSupabase.client; const [sr,cr]=await Promise.all([client.from('students').select('id, full_name, class_id').order('full_name'),client.from('classes').select('id, name')]); if(sr.error||cr.error){toast('Student list could not be loaded: '+(sr.error||cr.error).message);return;} const names=new Map((cr.data||[]).map(c=>[c.id,c.name])); students=(sr.data||[]).map(s=>[String(s.id),s.full_name,names.get(s.class_id)||'']); storage.set('ignis-students',students); select.innerHTML=linkedStudentOptions(selectedId);
+        const client=window.ignisSupabase.client; const [sr,cr]=await Promise.all([client.from('students').select('id, full_name, class_id').order('full_name'),client.from('classes').select('id, name')]); if(sr.error||cr.error){toast('Student list could not be loaded: '+(sr.error||cr.error).message);return;} const names=new Map((cr.data||[]).map(c=>[c.id,c.name])); students=(sr.data||[]).map(s=>[String(s.id),s.full_name,names.get(s.class_id)||'']); storage.set('ignis-students',students); if(select) select.innerHTML=linkedStudentOptions(selectedId);
         toast('Student list refreshed from Supabase.');
     };
 
