@@ -2319,4 +2319,3 @@ if (!session) {
     });
     pageSearchObserver.observe(document.body, { childList: true, subtree: true });
     attachPageSearch();
-}
