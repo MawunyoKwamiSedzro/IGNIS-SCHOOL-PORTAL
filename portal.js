@@ -1059,7 +1059,7 @@ if (!session) {
                                             <td>
                                                 <button class="link" onclick="editUserAccount('${a.email}')">Edit</button>
                                                 <button class="link" onclick="resetUserPassword('${a.email}')">Reset password</button>
-                                                <button class="link" onclick="toggleUserStatus('${a.user_id}', ${!a.is_active})">${a.is_active ? 'Disable' : 'Enable'}</button>
+                                                <button class="link" onclick="toggleUserStatus('${a.user_id}', ${!a.is_active})">${a.is_active ? 'Disable' : 'Enable'}</button> <button class="link danger-link" onclick="deleteUserAccount('${a.user_id}', '${a.email}')">Delete</button>
                                             </td>
                                         </tr>
                                     `)
@@ -2277,7 +2277,7 @@ if (!session) {
         render();
     };
 
-    window.resetUserPassword = async email => {
+    window.deleteUserAccount = async (userId, email) => { if (userId === session.id) { toast('You cannot delete your own account.'); return; } if (!window.confirm('Permanently delete the IGNIS account for ' + email + '?')) return; const { data, error } = await window.ignisSupabase.client.functions.invoke('set-user-status', { body: { user_id: userId, delete_user: true } }); if (error || data?.error) { toast(data?.error || error?.message || 'Account could not be deleted.'); return; } userAccounts = userAccounts.filter(account => account.user_id !== userId); sessionStorage.setItem('ignis-user-directory', JSON.stringify(userAccounts.map(account => ({ user_id: account.user_id, email: account.email, full_name: account.name, role: account.role, linked_student_id: account.wardId || null, is_active: account.is_active })))); toast('Portal account deleted.'); render(); }; if (page === 'user-accounts') setTimeout(() => window.refreshLinkedStudents(), 0); window.resetUserPassword = async email => {
         const { error } = await window.ignisSupabase.client.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/IGNIS-SCHOOL-PORTAL/reset-password.html` });
         toast(error ? error.message : `Password reset email sent to ${email}.`);
     };
