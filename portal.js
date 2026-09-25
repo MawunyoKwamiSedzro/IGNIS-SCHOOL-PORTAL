@@ -326,6 +326,7 @@ if (!session) {
 
     const notificationItems = () => {
         const items = [];
+        const readNotices = new Set(storage.get(`ignis-read-notices:${session.id}`, []));
         const outstanding = Object.values(fees).filter(ledger => ledger.amount > ledger.paid).length;
         const todaysStaff = staffAttendance[localDateKey()] || {};
         const teachersMissing = staffMembers().filter(member => !todaysStaff[member.email]).length;
@@ -341,6 +342,14 @@ if (!session) {
         const overdueAssignments = openAssignments.filter(item => item.due && item.due < localDateKey());
         if (overdueAssignments.length) items.push({ icon: '!', priority: 'Overdue', rank: 3, title: `${overdueAssignments.length} assignment${overdueAssignments.length > 1 ? 's' : ''} overdue`, note: 'Review the assignment list and follow up.', page: 'assignments' });
         else if (openAssignments.length) items.push({ icon: '▤', priority: 'New work', rank: 0, title: 'Assignments are available', note: 'Review coursework and due dates.', page: 'assignments' });
+
+        notices
+            .filter(notice => (notice.audience === 'All' || (isParent && notice.audience === 'Parents') || (!isParent && notice.audience === 'Staff')) && !readNotices.has(notice.id))
+            .forEach(notice => items.push({
+                icon: '✉', priority: 'New announcement', rank: 2,
+                title: notice.title, note: `Posted ${formatDate(notice.date)} · Open Notices`,
+                page: 'announcements', noticeId: notice.id
+            }));
 
         return items.sort((a, b) => b.rank - a.rank);
     };
@@ -1337,6 +1346,11 @@ if (!session) {
         document.querySelectorAll('.notification-item').forEach(button => {
             button.onclick = () => {
                 const item = items[Number(button.dataset.index)];
+                if (item.noticeId) {
+                    const read = new Set(storage.get(`ignis-read-notices:${session.id}`, []));
+                    read.add(item.noticeId);
+                    storage.set(`ignis-read-notices:${session.id}`, [...read]);
+                }
                 closeModal();
                 location.href = `${item.page}.html`;
             };
