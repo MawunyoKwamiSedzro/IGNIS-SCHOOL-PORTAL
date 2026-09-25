@@ -2213,7 +2213,8 @@ if (!session) {
             const account = accountDirectory().find(item => item.email === originalEmail);
             const { error } = await client.from('profiles').update({ full_name: fullName, role, linked_student_id: wardId || null }).eq('user_id', account.user_id);
             if (error) { toast(error.message || 'Profile update failed.'); return; }
-            await client.from('parent_student_links').delete().eq('parent_user_id', account.user_id);
+            const { error: removeError } = await client.from('parent_student_links').delete().eq('parent_user_id', account.user_id);
+            if (removeError) { toast('Student link could not be updated: ' + removeError.message); return; }
             if (wardId && ['Parent', 'Parent / Student'].includes(role)) {
                 const { error: linkError } = await client.from('parent_student_links').insert({ parent_user_id: account.user_id, student_id: wardId });
                 if (linkError) { toast(linkError.message || 'Student link could not be saved.'); return; }
@@ -2249,11 +2250,11 @@ if (!session) {
         document.getElementById('userAccountForm').onsubmit = event => saveUserAccount(event);
     };
 
-    window.refreshLinkedStudents = () => {
+    window.refreshLinkedStudents = async () => {
         const select = document.querySelector('select[name="wardId"]');
         if (!select) return;
         const selectedId = select.value;
-        select.innerHTML = linkedStudentOptions(selectedId);
+        const client=window.ignisSupabase.client; const [sr,cr]=await Promise.all([client.from('students').select('id, full_name, class_id').order('full_name'),client.from('classes').select('id, name')]); if(sr.error||cr.error){toast('Student list could not be loaded: '+(sr.error||cr.error).message);return;} const names=new Map((cr.data||[]).map(c=>[c.id,c.name])); students=(sr.data||[]).map(s=>[String(s.id),s.full_name,names.get(s.class_id)||'']); storage.set('ignis-students',students); select.innerHTML=linkedStudentOptions(selectedId);
         toast('Linked-student list refreshed.');
     };
 
