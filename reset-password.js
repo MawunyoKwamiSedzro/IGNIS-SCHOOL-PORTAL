@@ -28,7 +28,7 @@ function showExpiredLinkMessage() {
 }
 
 const query = new URLSearchParams(location.search);
-if (query.has('error') || query.has('error_code')) {
+if (query.has('error') || query.has('error_code') || new URLSearchParams(location.hash.slice(1)).has('error') || new URLSearchParams(location.hash.slice(1)).has('error_code')) {
     showExpiredLinkMessage();
 }
 
