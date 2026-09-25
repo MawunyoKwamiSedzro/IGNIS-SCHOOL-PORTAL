@@ -443,7 +443,7 @@ if (!session) {
                 `;
             }
 
-            const summary = operationalSummary();
+            if (!isAdmin) {                const assignedClasses = classesData.filter(item => item.teacherId === session.id);                const assignedClassNames = new Set(assignedClasses.map(item => item.name));                const myAssignments = assignments.filter(item => assignedClassNames.has(item.class));                const myAttendance = staffAttendance[localDateKey()]?.[session.email];                const upcoming = myAssignments.filter(item => !item.due || item.due >= localDateKey());                return heading(`Welcome back, ${session.name.split(' ')[0]}`, 'Your teaching overview for today.') + `                    <div class="stats">                        <div class="stat"><div class="stat-top">Your attendance</div><b>${myAttendance ? (myAttendance.status === 'late' ? 'Late' : 'Present') : 'Not recorded'}</b><small>${myAttendance ? `Recorded at ${new Date(myAttendance.recordedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Complete your geofenced check-in.'}</small></div>                        <div class="stat"><div class="stat-top">Your classes</div><b>${assignedClasses.length}</b><small>Classes assigned to you</small></div>                        <div class="stat"><div class="stat-top">Your assignments</div><b>${upcoming.length}</b><small>Open coursework for your classes</small></div>                    </div>                    ${!myAttendance ? `<div class="card"><h2>Record your attendance</h2><p>Check in from an approved school location.</p>${button('Verify location', "location.href='attendance.html'")}</div>` : ''}                    <div class="card"><h2>Your classes</h2>${assignedClasses.length ? assignedClasses.map(item => `<div class="flag"><span class="flag-icon">▦</span><div><b>${item.name}</b><small>${item.level || 'Class'}</small></div></div>`).join('') : '<div class="empty">No classes are assigned to your account yet.</div>'}</div>                    <div class="card"><h2>Upcoming assignments</h2>${upcoming.length ? upcoming.map(item => `<div class="flag"><span class="flag-icon">▤</span><div><b>${item.title}</b><small>${item.subject} · ${item.class}${item.due ? ` · Due ${formatDate(item.due)}` : ''}</small></div></div>`).join('') : '<div class="empty">No open assignments for your classes.</div>'}</div>                `;            }            const summary = operationalSummary();
 
             return heading(
                 `Welcome back, ${session.name.split(' ')[0]}`,
@@ -1434,8 +1434,8 @@ if (!session) {
         document.querySelectorAll('#accountRows tr').forEach(row => { row.hidden = !row.textContent.toLowerCase().includes(query); });
     };
 
-    window.clockIn = () => {
-        if (!isTeacher) {
+    let clockInPending = false;    window.clockIn = () => {
+        if (clockInPending) return; if (!isTeacher) {
             toast('Only teaching staff can use teacher clock-in.');
             return;
         }
@@ -1443,35 +1443,35 @@ if (!session) {
             toast('Your attendance is already recorded for today.');
             return;
         }
-        if (!navigator.geolocation) {
+        if (!window.isSecureContext) { toast('Location check-in requires HTTPS.'); return; } if (!navigator.geolocation) {
             toast('Location access is not available in this browser.');
             return;
         }
 
-        toast('Getting your location…');
+        clockInPending = true; toast('Getting your location…');
 
         navigator.geolocation.getCurrentPosition(
             async position => {
                 const { latitude, longitude } = position.coords;
                 const { data, error } = await window.ignisSupabase.client.functions.invoke('clock-in', { body: { latitude, longitude } });
                 if (error || data?.error) {
-                    toast(data?.error || error?.message || 'Attendance could not be recorded.');
+                    clockInPending = false; toast(data?.error || error?.context?.message || error?.message || 'Check-in failed. Confirm the clock-in function is deployed and an approved zone is configured.');
                     return;
                 }
-                const record = { email: session.email, name: session.name, time: Date.parse(data.recorded_at), lat: latitude, lng: longitude, zoneName: data.zone_name, distance: data.distance_meters, verified: true };
+                const record = { email: session.email, name: session.name, time: Date.parse(data.recorded_at), lat: latitude, lng: longitude, zoneName: data.zone_name, distance: data.distance_meters, radius: data.radius_meters || geofences.find(zone => zone.name === data.zone_name)?.radius, verified: true };
                 checkins.push(record);
                 const date = localDateKey(new Date(record.time));
                 staffAttendance[date] ||= {};
                 staffAttendance[date][session.email] = { email: session.email, name: session.name, role: session.role, status: data.status, recordedAt: data.recorded_at, zoneName: data.zone_name, distance: data.distance_meters };
                 storage.set('ignis-staff-attendance', staffAttendance);
-                storage.set('ignis-checkins', checkins);
+                storage.set('ignis-checkins', checkins); clockInPending = false;
                 toast(`Location verified — attendance recorded${data.status === 'late' ? ' as late' : ''}.`);
                 render();
             },
             () => {
-                toast('Location could not be verified. Check-in blocked.');
+                clockInPending = false; toast('Location permission may be blocked or device location unavailable. Allow location access for this site and retry.');
             },
-            { enableHighAccuracy: true, timeout: 10000 }
+            { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
         );
     };
 
