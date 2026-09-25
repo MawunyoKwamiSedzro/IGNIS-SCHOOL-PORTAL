@@ -329,19 +329,19 @@ if (!session) {
         const todaysStaff = staffAttendance[localDateKey()] || {};
         const teachersMissing = staffMembers().filter(member => !todaysStaff[member.email]).length;
 
-        if (isAdmin && outstanding) items.push({ icon: '₵', title: `${outstanding} fee account${outstanding > 1 ? 's' : ''} outstanding`, note: 'Review balances in Fees & billing.', page: 'fees' });
-        if (isAdmin && teachersMissing) items.push({ icon: '◷', title: `${teachersMissing} teacher${teachersMissing > 1 ? 's' : ''} not marked present`, note: 'Open the daily staff attendance report.', page: 'staff-attendance' });
-        if (isTeacher && !staffAttendance[localDateKey()]?.[session.email]) items.push({ icon: '✓', title: 'Mark your attendance', note: 'Your daily staff register is still open.', page: 'staff-attendance' });
+        if (isAdmin && outstanding) items.push({ icon: '₵', priority: 'Action needed', rank: 2, title: `${outstanding} fee account${outstanding > 1 ? 's' : ''} outstanding`, note: 'Review balances in Fees & billing.', page: 'fees' });
+        if (isAdmin && teachersMissing) items.push({ icon: '◷', priority: 'Review', rank: 1, title: `${teachersMissing} teacher${teachersMissing > 1 ? 's' : ''} not marked present`, note: 'Open the daily staff attendance report.', page: 'staff-attendance' });
+        if (isTeacher && !staffAttendance[localDateKey()]?.[session.email]) items.push({ icon: '✓', priority: 'Action needed', rank: 2, title: 'Mark your attendance', note: 'Your daily staff register is still open.', page: 'staff-attendance' });
         if (isParent) {
             const ledger = fees[session.wardId];
-            if (ledger && ledger.amount > ledger.paid) items.push({ icon: '₵', title: 'School-fee payment due', note: `GH₵ ${(ledger.amount - ledger.paid).toFixed(2)} remains for this term.`, page: 'fees' });
+            if (ledger && ledger.amount > ledger.paid) items.push({ icon: '₵', priority: 'Payment due', rank: 2, title: 'School-fee payment due', note: `GH₵ ${(ledger.amount - ledger.paid).toFixed(2)} remains for this term.`, page: 'fees' });
         }
         const openAssignments = assignmentsFor(session);
-        const overdueAssignments = openAssignments.filter(item => item.due < localDateKey());
-        if (overdueAssignments.length) items.push({ icon: '!', title: `${overdueAssignments.length} assignment${overdueAssignments.length > 1 ? 's' : ''} overdue`, note: 'Review the assignment list and follow up.', page: 'assignments' });
-        else if (openAssignments.length) items.push({ icon: '▤', title: 'Assignments are available', note: 'Review coursework and due dates.', page: 'assignments' });
+        const overdueAssignments = openAssignments.filter(item => item.due && item.due < localDateKey());
+        if (overdueAssignments.length) items.push({ icon: '!', priority: 'Overdue', rank: 3, title: `${overdueAssignments.length} assignment${overdueAssignments.length > 1 ? 's' : ''} overdue`, note: 'Review the assignment list and follow up.', page: 'assignments' });
+        else if (openAssignments.length) items.push({ icon: '▤', priority: 'New work', rank: 0, title: 'Assignments are available', note: 'Review coursework and due dates.', page: 'assignments' });
 
-        return items.slice(0, 5);
+        return items.sort((a, b) => b.rank - a.rank);
     };
 
     const searchEntries = () => {
@@ -349,6 +349,7 @@ if (!session) {
             ...students.map(student => ({
                 title: student[1],
                 note: `${student[0]} · ${student[2]} · Student`,
+                searchText: `${student[0]} ${student[1]} ${student[2]} ${student[3] || ''} ${student[4] || ''} ${student[5] || ''}`,
                 action: { type: 'student', id: student[0] }
             })),
             ...classesData.map(item => ({
@@ -363,8 +364,13 @@ if (!session) {
             })),
             ...notices
                 .filter(item => item.audience === 'All' || (isParent ? item.audience === 'Parents' : item.audience === 'Staff'))
-                .map(item => ({ title: item.title, note: `Notice · ${formatDate(item.date)}`, action: { type: 'page', page: 'announcements' } }))
+                .map(item => ({ title: item.title, note: `Notice · ${formatDate(item.date)}`, searchText: `${item.title} ${item.body || ''}`, action: { type: 'page', page: 'announcements' } }))
         ];
+        if (isAdmin) entries.push(...userAccounts.map(account => ({
+            title: account.name,
+            note: `${account.email} · ${account.role}`,
+            action: { type: 'page', page: 'accounts' }
+        })));
         return entries;
     };
 
@@ -1165,10 +1171,10 @@ if (!session) {
 
                     <div class="top-actions">
 
-                        <button class="top-icon-button search-trigger" type="button" onclick="openQuickSearch()" aria-label="Search portal"><span aria-hidden="true">⌕</span><kbd>Ctrl K</kbd></button>
+                        <button class="top-icon-button search-trigger" type="button" onclick="openQuickSearch()" aria-label="Search school records"><span aria-hidden="true">⌕</span><span class="search-label">Search records</span><kbd>Ctrl K</kbd></button>
                         <button class="top-icon-button" type="button" onclick="openNotifications()" aria-label="Open notifications">
                             <span aria-hidden="true">♢</span>
-                            ${notificationItems().length ? `<span class="notification-badge">${notificationItems().length}</span>` : ''}
+                            ${notificationItems().length ? `<span class="notification-badge">${notificationItems().length > 9 ? '9+' : notificationItems().length}</span>` : ''}
                         </button>
 
                         <div class="term">
@@ -1280,16 +1286,23 @@ if (!session) {
     window.openQuickSearch = () => {
         const entries = searchEntries();
         openModal(`
-            <h2 id="modalTitle">Find anything</h2>
-            <p class="subline">Search students, classes, assignments, and notices.</p>
-            <div class="search-box modal-search"><input id="quickSearchInput" type="search" placeholder="Start typing a name or item…" autocomplete="off"></div>
+            <h2 id="modalTitle">Search school records</h2>
+            <p class="subline">Search records available to your account. Students can be found by name, ID, class, or guardian contact.</p>
+            <div class="search-box modal-search"><input id="quickSearchInput" type="search" placeholder="Search by name, ID, class, or keyword…" autocomplete="off"></div>
             <div id="quickSearchResults" class="quick-results"></div>
         `);
         const input = document.getElementById('quickSearchInput');
         const results = document.getElementById('quickSearchResults');
         const showResults = () => {
-            const query = input.value.trim().toLowerCase();
-            const matches = entries.filter(item => !query || `${item.title} ${item.note}`.toLowerCase().includes(query)).slice(0, 8);
+            const query = input.value.trim().toLocaleLowerCase();
+            if (query.length < 2) {
+                results.innerHTML = '<div class="empty">Enter at least two characters to search available records.</div>';
+                return;
+            }
+            const matches = entries
+                .filter(item => `${item.searchText || ''} ${item.title} ${item.note}`.toLocaleLowerCase().includes(query))
+                .sort((a, b) => Number(b.title.toLocaleLowerCase().startsWith(query)) - Number(a.title.toLocaleLowerCase().startsWith(query)))
+                .slice(0, 12);
             results.innerHTML = matches.length ? matches.map((item, index) => `
                 <button class="quick-result" type="button" data-index="${index}"><b>${item.title}</b><small>${item.note}</small></button>
             `).join('') : '<div class="empty">No matching records found.</div>';
@@ -1309,11 +1322,12 @@ if (!session) {
     window.openNotifications = () => {
         const items = notificationItems();
         openModal(`
-            <h2 id="modalTitle">Your updates</h2>
-            <p class="subline">Items that may need your attention today.</p>
+            <h2 id="modalTitle">Pending notifications</h2>
+            <p class="subline">Current reminders from attendance, fees, and coursework. Most urgent items appear first.</p>
+            <div class="notification-summary"><b>${items.length ? `${items.length} pending item${items.length === 1 ? '' : 's'}` : 'No pending items'}</b><small>Open a reminder to go to the related section.</small></div>
             <div class="notification-list">
                 ${items.length ? items.map((item, index) => `
-                    <button type="button" class="notification-item" data-index="${index}"><span class="flag-icon">${item.icon}</span><span><b>${item.title}</b><small>${item.note}</small></span></button>
+                    <button type="button" class="notification-item priority-${item.rank}" data-index="${index}"><span class="flag-icon">${item.icon}</span><span class="notification-copy"><b>${item.title}</b><small>${item.note}</small></span><span class="notification-priority priority-${item.rank}">${item.priority}</span></button>
                 `).join('') : '<div class="empty">You’re all caught up.</div>'}
             </div>
         `);
@@ -1434,8 +1448,10 @@ if (!session) {
         document.querySelectorAll('#accountRows tr').forEach(row => { row.hidden = !row.textContent.toLowerCase().includes(query); });
     };
 
-    let clockInPending = false;    window.clockIn = () => {
-        if (clockInPending) return; if (!isTeacher) {
+    let clockInPending = false;
+    window.clockIn = () => {
+        if (clockInPending) return;
+        if (!isTeacher) {
             toast('Only teaching staff can use teacher clock-in.');
             return;
         }
@@ -1443,36 +1459,52 @@ if (!session) {
             toast('Your attendance is already recorded for today.');
             return;
         }
-        if (!window.isSecureContext) { toast('Location check-in requires HTTPS.'); return; } if (!navigator.geolocation) {
-            toast('Location access is not available in this browser.');
+        if (!window.isSecureContext || !navigator.geolocation) {
+            toast('Location check-in requires the secure HTTPS portal and browser location support.');
             return;
         }
 
-        clockInPending = true; toast('Getting your location…');
+        clockInPending = true;
+        toast('Getting your location…');
 
-        navigator.geolocation.getCurrentPosition(
-            async position => {
+        const onLocationSuccess = async position => {
                 const { latitude, longitude } = position.coords;
-                const { data, error } = await window.ignisSupabase.client.functions.invoke('clock-in', { body: { latitude, longitude } });
-                if (error || data?.error) {
-                    clockInPending = false; toast(data?.error || error?.context?.message || error?.message || 'Check-in failed. Confirm the clock-in function is deployed and an approved zone is configured.');
-                    return;
+                try {
+                    const { data, error } = await window.ignisSupabase.client.functions.invoke('clock-in', { body: { latitude, longitude } });
+                    if (error || data?.error) {
+                        clockInPending = false;
+                        toast(data?.error || error?.context?.message || error?.message || 'Check-in failed. Confirm the attendance service and approved school zone.');
+                        return;
+                    }
+                    const record = { email: session.email, name: session.name, time: Date.parse(data.recorded_at), lat: latitude, lng: longitude, zoneName: data.zone_name, distance: data.distance_meters, radius: data.radius_meters || geofences.find(zone => zone.name === data.zone_name)?.radius, verified: true };
+                    checkins.push(record);
+                    const date = localDateKey(new Date(record.time));
+                    staffAttendance[date] ||= {};
+                    staffAttendance[date][session.email] = { email: session.email, name: session.name, role: session.role, status: data.status, recordedAt: data.recorded_at, zoneName: data.zone_name, distance: data.distance_meters };
+                    storage.set('ignis-staff-attendance', staffAttendance);
+                    storage.set('ignis-checkins', checkins);
+                    clockInPending = false;
+                    toast(`Location verified — attendance recorded${data.status === 'late' ? ' as late' : ''}.`);
+                    render();
+                } catch (error) {
+                    clockInPending = false;
+                    toast(`Check-in could not reach the attendance service: ${error.message || 'check your connection and retry.'}`);
                 }
-                const record = { email: session.email, name: session.name, time: Date.parse(data.recorded_at), lat: latitude, lng: longitude, zoneName: data.zone_name, distance: data.distance_meters, radius: data.radius_meters || geofences.find(zone => zone.name === data.zone_name)?.radius, verified: true };
-                checkins.push(record);
-                const date = localDateKey(new Date(record.time));
-                staffAttendance[date] ||= {};
-                staffAttendance[date][session.email] = { email: session.email, name: session.name, role: session.role, status: data.status, recordedAt: data.recorded_at, zoneName: data.zone_name, distance: data.distance_meters };
-                storage.set('ignis-staff-attendance', staffAttendance);
-                storage.set('ignis-checkins', checkins); clockInPending = false;
-                toast(`Location verified — attendance recorded${data.status === 'late' ? ' as late' : ''}.`);
-                render();
-            },
-            () => {
-                clockInPending = false; toast('Location permission may be blocked or device location unavailable. Allow location access for this site and retry.');
-            },
-            { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
-        );
+        };
+        const onLocationError = error => {
+            clockInPending = false;
+            const messages = {
+                1: 'Location permission is blocked. Allow location access for this site, then try again.',
+                2: 'Your device could not determine its location. Turn on device location and retry.',
+                3: 'Location lookup timed out. Try again outdoors or with Wi-Fi enabled.'
+            };
+            toast(messages[error.code] || 'Location could not be verified. Check-in blocked.');
+        };
+        navigator.geolocation.getCurrentPosition(onLocationSuccess, error => {
+            if (error.code === 1) { onLocationError(error); return; }
+            toast('Precise GPS is unavailable. Trying standard device location…');
+            navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError, { enableHighAccuracy: false, maximumAge: 10000, timeout: 30000 });
+        }, { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 });
     };
 
     window.manageGeofences = () => {
@@ -1495,6 +1527,8 @@ if (!session) {
                         <input name="lng" type="number" step="any" required>
                     </div>
                 </div>
+                <button class="secondary" type="button" onclick="useCurrentLocationForZone()">Use this device location</button>
+                <small class="subline">Set the zone centre while this device is at the school.</small>
                 <div class="field">
                     <label>Radius (metres)</label>
                     <input name="radius" type="number" value="150" required>
@@ -1522,6 +1556,32 @@ if (!session) {
                     .join('')}
             </div>
         `);
+
+        window.useCurrentLocationForZone = () => {
+            if (!isAdmin) { toast('Only school administrators can set attendance zones.'); return; }
+            if (!window.isSecureContext || !navigator.geolocation) { toast('Location setup requires the secure HTTPS portal and browser location support.'); return; }
+            const form = document.getElementById('zoneForm');
+            const captureButton = form.querySelector('button[type="button"]');
+            captureButton.disabled = true;
+            captureButton.textContent = 'Getting this device location…';
+            const onPosition = position => {
+                form.elements.lat.value = position.coords.latitude.toFixed(6);
+                form.elements.lng.value = position.coords.longitude.toFixed(6);
+                captureButton.disabled = false;
+                captureButton.textContent = 'Use this device location';
+                toast(`Coordinates filled. Device accuracy is about ${Math.round(position.coords.accuracy)}m; set an appropriate zone radius.`);
+            };
+            const onError = error => {
+                captureButton.disabled = false;
+                captureButton.textContent = 'Use this device location';
+                toast(error.code === 1 ? 'Allow location access for this site, then try again.' : 'Could not get this device location. Check device location and retry.');
+            };
+            navigator.geolocation.getCurrentPosition(onPosition, error => {
+                if (error.code === 1) { onError(error); return; }
+                toast('Precise GPS is unavailable. Trying standard device location…');
+                navigator.geolocation.getCurrentPosition(onPosition, onError, { enableHighAccuracy: false, maximumAge: 10000, timeout: 30000 });
+            }, { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 });
+        };
 
         document.getElementById('zoneForm').onsubmit = async e => {
             e.preventDefault();
