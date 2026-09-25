@@ -1154,6 +1154,18 @@ td {
 
 .settings-card { max-width: 800px; }
 
+.term-empty-note {
+    display: grid;
+    gap: 5px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    border: 1px solid #dce8e4;
+    border-radius: 9px;
+    background: #f4f8f6;
+}
+
+.term-empty-note span { color: var(--muted); font-size: 12px; }
+
 .form-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
