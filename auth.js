@@ -75,7 +75,7 @@ forgotPassword.addEventListener('click', async () => {
         showError(setupError || 'IGNIS is not connected to Supabase yet.');
         return;
     }
-    const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/reset-password.html` });
+    const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/IGNIS-SCHOOL-PORTAL/reset-password.html` });
     if (error) showError(error.message);
     else showError('If that address belongs to an account, password reset instructions have been sent.');
 });
