@@ -2277,7 +2277,7 @@ if (!session) {
     };
 
     window.resetUserPassword = async email => {
-        const { error } = await window.ignisSupabase.client.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/reset-password.html` });
+        const { error } = await window.ignisSupabase.client.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/IGNIS-SCHOOL-PORTAL/reset-password.html` });
         toast(error ? error.message : `Password reset email sent to ${email}.`);
     };
 }
