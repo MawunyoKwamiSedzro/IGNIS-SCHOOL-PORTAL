@@ -35,9 +35,9 @@
         if (zonesError) throw zonesError;
         localStorage.setItem('ignis-geofences', JSON.stringify((zoneRows || []).map(zone => ({ id: zone.id, name: zone.name, lat: zone.latitude, lng: zone.longitude, radius: zone.radius_meters }))));
         const { data: arrivalSetting } = await client.from('school_settings').select('setting_value').eq('setting_key', 'arrival_by').maybeSingle();
-        if (arrivalSetting?.setting_value?.time) localStorage.setItem('ignis-attendance-policy', JSON.stringify({ arrivalBy: arrivalSetting.setting_value.time }));
+        localStorage.setItem('ignis-attendance-policy', JSON.stringify({ arrivalBy: arrivalSetting?.setting_value?.time || '' }));
         const { data: termSetting } = await client.from('school_settings').select('setting_value').eq('setting_key', 'current_term').maybeSingle();
-        localStorage.setItem('ignis-current-term', JSON.stringify(termSetting?.setting_value?.name || 'Term not configured'));
+        localStorage.setItem('ignis-current-term', JSON.stringify(termSetting?.setting_value?.name || 'Not configured'));
         const { data: studentRows, error: studentsError } = await client.from('students')
             .select('id, full_name, class_id, guardian_name, guardian_phone, guardian_email, status')
             .order('full_name');
