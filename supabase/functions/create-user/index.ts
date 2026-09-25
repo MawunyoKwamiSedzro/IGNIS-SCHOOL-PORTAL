@@ -48,7 +48,7 @@ Deno.serve(async request => {
   }
 
   const { data: invite, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
-    data: { full_name: fullName },
+    redirectTo: 'https://mawunyokwamisedzro.github.io/IGNIS-SCHOOL-PORTAL/reset-password.html', data: { full_name: fullName },
   });
   if (inviteError || !invite.user) return json({ error: inviteError?.message || 'Could not send the account invitation.' }, 400);
 
