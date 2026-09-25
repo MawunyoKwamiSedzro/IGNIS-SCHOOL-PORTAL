@@ -1687,7 +1687,7 @@ if (!session) {
         const subjectScores = scores[id] || [];
 
         openModal(`
-            <h2>${student[1]}</h2>
+            <h2>${student[1]}</h2>${isAdmin ? `<button class="link danger-link" onclick="deleteStudent('${id}')">Delete student</button>` : ''}
             <p class="subline">${id} · ${student[2]}</p>
 
             <div class="field">
