@@ -38,6 +38,9 @@
         localStorage.setItem('ignis-attendance-policy', JSON.stringify({ arrivalBy: arrivalSetting?.setting_value?.time || '' }));
         const { data: termSetting } = await client.from('school_settings').select('setting_value').eq('setting_key', 'current_term').maybeSingle();
         localStorage.setItem('ignis-current-term', JSON.stringify(termSetting?.setting_value?.name || 'Not configured'));
+        const { data: termsSetting, error: termsError } = await client.from('school_settings').select('setting_value').eq('setting_key', 'academic_terms').maybeSingle();
+        if (termsError) throw termsError;
+        localStorage.setItem('ignis-academic-terms', JSON.stringify(Array.isArray(termsSetting?.setting_value) ? termsSetting.setting_value : []));
         const { data: studentRows, error: studentsError } = await client.from('students')
             .select('id, full_name, class_id, guardian_name, guardian_phone, guardian_email, status')
             .order('full_name');

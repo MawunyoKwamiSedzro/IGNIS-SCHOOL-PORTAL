@@ -166,6 +166,7 @@ if (!session) {
     let staffAttendance = storage.get('ignis-staff-attendance', {});
     let attendancePolicy = storage.get('ignis-attendance-policy', { arrivalBy: '' });
     let currentTerm = storage.get('ignis-current-term', 'Not configured');
+    let academicTerms = storage.get('ignis-academic-terms', []);
 
     const localDateKey = date => {
         const value = date || new Date();
@@ -1076,11 +1077,13 @@ if (!session) {
                 <p class="subline">Accounts are managed in Supabase Auth. Invitations are delivered to each account email.</p>
             `,
 
-        settings: () => heading('School settings', 'Set the current academic term and operational defaults.') + `
+        settings: () => heading('School settings', 'Set term dates and choose which term is active. Records remain saved under their original term and dates.') + `
             <div class="card settings-card"><form id="schoolTermForm" onsubmit="saveSchoolTerm(event)">
-                <div class="field"><label for="currentTermInput">Current academic term</label><input id="currentTermInput" name="term" value="${currentTerm === 'Not configured' ? '' : currentTerm}" placeholder="Enter the current term and academic year" required></div>
-                <button class="primary" type="submit">Save school settings</button>
-            </form><p class="subline">Attendance arrival time and approved locations are configured from the Staff attendance page.</p></div>
+                <div class="field"><label for="academicTermPicker">Saved terms</label><select id="academicTermPicker" onchange="loadAcademicTerm(this.value)"><option value="">Create a new term</option>${academicTerms.map(term => `<option value="${encodeURIComponent(term.name)}" ${term.name === currentTerm ? 'selected' : ''}>${term.name} (${term.startDate} – ${term.endDate})</option>`).join('')}</select></div>
+                <div class="field"><label for="currentTermInput">Term name and academic year</label><input id="currentTermInput" name="term" value="${currentTerm === 'Not configured' ? '' : currentTerm}" placeholder="e.g. Term 1 · 2026/2027" required></div>
+                <div class="form-grid"><div class="field"><label for="termStartDate">Start date</label><input id="termStartDate" name="startDate" type="date" required></div><div class="field"><label for="termEndDate">End date</label><input id="termEndDate" name="endDate" type="date" required></div></div>
+                <div class="actions"><button class="primary" type="submit">Save and set as current</button>${academicTerms.length ? `<button class="secondary" type="button" onclick="setSelectedTermCurrent()">Set selected term as current</button>` : ''}</div>
+            </form><p class="subline">Scores and fee ledgers keep their term labels. Student and staff attendance keep the exact attendance date and recorded time. Attendance arrival time and approved locations are configured from the Staff attendance page.</p></div>
         `,
 
         'user-accounts': () =>
@@ -1230,7 +1233,7 @@ if (!session) {
 
             </div>
         </div>
-    `; };
+    `; if (page === 'settings') { const saved = academicTerms.find(term => term.name === currentTerm); if (saved) { document.getElementById('termStartDate').value = saved.startDate || ''; document.getElementById('termEndDate').value = saved.endDate || ''; } } };
 
     render();
 
@@ -1385,14 +1388,40 @@ if (!session) {
 
     window.saveSchoolTerm = async event => {
         event.preventDefault();
-        const term = String(new FormData(event.target).get('term')).trim();
-        const { error } = await window.ignisSupabase.client.from('school_settings').upsert({
-            setting_key: 'current_term', setting_value: { name: term }, updated_by: session.id
-        });
-        if (error) { toast(error.message || 'School settings could not be saved.'); return; }
+        const form = new FormData(event.target);
+        const term = String(form.get('term')).trim();
+        const startDate = String(form.get('startDate'));
+        const endDate = String(form.get('endDate'));
+        if (!startDate || !endDate || startDate > endDate) { toast('Choose a valid start date and end date for the term.'); return; }
+        const record = { name: term, startDate, endDate };
+        academicTerms = [...academicTerms.filter(item => item.name !== term), record].sort((a, b) => a.startDate.localeCompare(b.startDate));
+        const { error: termsError } = await window.ignisSupabase.client.from('school_settings').upsert({ setting_key: 'academic_terms', setting_value: academicTerms, updated_by: session.id });
+        if (termsError) { toast(termsError.message || 'Term history could not be saved.'); return; }
+        const { error } = await window.ignisSupabase.client.from('school_settings').upsert({ setting_key: 'current_term', setting_value: record, updated_by: session.id });
+        if (error) { toast(error.message || 'Current term could not be saved.'); return; }
         currentTerm = term;
         storage.set('ignis-current-term', currentTerm);
-        toast('Current term saved.');
+        storage.set('ignis-academic-terms', academicTerms);
+        toast('Term dates saved. It is now the current term.');
+        render();
+    };
+
+    window.loadAcademicTerm = encodedName => {
+        const term = academicTerms.find(item => item.name === decodeURIComponent(encodedName || ''));
+        document.getElementById('currentTermInput').value = term?.name || '';
+        document.getElementById('termStartDate').value = term?.startDate || '';
+        document.getElementById('termEndDate').value = term?.endDate || '';
+    };
+
+    window.setSelectedTermCurrent = async () => {
+        const name = document.getElementById('academicTermPicker')?.value;
+        const term = academicTerms.find(item => item.name === decodeURIComponent(name || ''));
+        if (!term) { toast('Select a saved term first.'); return; }
+        const { error } = await window.ignisSupabase.client.from('school_settings').upsert({ setting_key: 'current_term', setting_value: term, updated_by: session.id });
+        if (error) { toast(error.message || 'Current term could not be changed.'); return; }
+        currentTerm = term.name;
+        storage.set('ignis-current-term', currentTerm);
+        toast('Current term changed. Historical records remain available.');
         render();
     };
 

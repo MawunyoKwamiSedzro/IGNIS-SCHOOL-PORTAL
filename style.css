@@ -42,6 +42,34 @@ body {
     font: 14px 'DM Sans', Arial, sans-serif;
 }
 
+@view-transition {
+    navigation: auto;
+}
+
+::view-transition-old(root) {
+    animation: portal-page-out 140ms ease both;
+}
+
+::view-transition-new(root) {
+    animation: portal-page-in 220ms ease both;
+}
+
+@keyframes portal-page-out {
+    to { opacity: 0; }
+}
+
+@keyframes portal-page-in {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation-duration: 1ms;
+    }
+}
+
 button,
 input,
 select,
@@ -1125,6 +1153,23 @@ td {
 .payment-consent input { width: auto; margin-top: 2px; }
 
 .settings-card { max-width: 800px; }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.settings-card .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+@media (max-width: 620px) {
+    .form-grid { grid-template-columns: 1fr; gap: 0; }
+}
 
 .settings-grid {
     display: grid;
