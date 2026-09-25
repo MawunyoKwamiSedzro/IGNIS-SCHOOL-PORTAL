@@ -688,7 +688,7 @@ if (!session) {
                                             ? students.filter(s => s[2] === c.name).map(s => `<button class="link roster-link" onclick="studentProfile('${s[0]}')"><b>${s[1]}</b><small>${s[0]} · ${s[3]}</small></button>`).join('')
                                             : '<small class="subline">No students enrolled yet.</small>'}
                                     </div>
-                                    ${(isTeacher || isAdmin) ? `<button class="secondary" onclick="openRegister('${c.id}')">${isAdmin ? 'View daily register' : 'Open daily register'}</button>` : ''}
+                                    ${(isTeacher || isAdmin) ? `<button class="secondary" onclick="openRegister('${c.id}')">${isAdmin ? 'View daily register' : 'Open daily register'}</button>` : ''}${isAdmin ? `<button class="link danger-link" onclick="deleteClass('${c.id}')">Delete class</button>` : ''}
                                 </div>
                             `
                         )
@@ -716,7 +716,7 @@ if (!session) {
                                     <span class="pill ${isParent ? (guardianSubmitted ? 'green' : 'red') : (submittedIds.length >= roster.length && roster.length ? 'green' : (submittedIds.length ? 'amber' : 'red'))}">
                                         ${isParent ? (guardianSubmitted ? 'Submitted' : 'Not submitted') : `${submittedIds.length} / ${roster.length} submitted`}
                                     </span>
-                                    ${isAdmin ? `<button class="link" onclick="viewAssignmentProgress('${a.id}')">View students</button><button class="link danger-link" onclick="removeAssignment('${a.id}')">Remove</button>` : (isTeacher ? `<button class="link" onclick="viewAssignmentProgress('${a.id}')">Record submissions</button><button class="link danger-link" onclick="removeAssignment('${a.id}')">Remove</button>` : '')}
+                                    ${isAdmin ? `<button class="link" onclick="viewAssignmentProgress('${a.id}')">View students</button><button class="link danger-link" onclick="removeAssignment('${a.id}')">Delete</button>` : (isTeacher ? `<button class="link" onclick="viewAssignmentProgress('${a.id}')">Record submissions</button><button class="link danger-link" onclick="removeAssignment('${a.id}')">Delete</button>` : '')}
                                 </div>
                             </div>`;
                     }).join('') || `<div class="empty">No assignments to show.</div>`}
@@ -753,7 +753,7 @@ if (!session) {
                                     <th>Class score (30)</th>
                                     <th>Exam score (70)</th>
                                     <th>Total</th>
-                                    <th>Grade</th>
+                                    <th>Grade</th>${(isAdmin || isTeacher) ? '<th></th>' : ''}
                                 </tr>
                             </thead>
                             <tbody>
@@ -769,7 +769,7 @@ if (!session) {
                                                         <td><b>${s.classScore + s.examScore}</b></td>
                                                         <td><span class="pill ${
                                                             s.grade === 'A' ? 'green' : (s.grade === 'B' ? 'amber' : 'red')
-                                                        }">${s.grade}</span></td>
+                                                        }">${s.grade}</span></td>${(isAdmin || isTeacher) ? `<td><button class="link danger-link" onclick="deleteScore('${student[0]}', '${encodeURIComponent(s.subject)}', '${encodeURIComponent(s.term || '')}')">Delete</button></td>` : ''}
                                                     </tr>
                                                 `
                                             )
@@ -931,7 +931,7 @@ if (!session) {
                                             </td>
                                             ${
                                                 isAdmin
-                                                    ? `<td><button class="link" onclick="${ledger ? `recordPayment('${s[0]}')` : `setStudentFee('${s[0]}')`}">${ledger ? 'Record payment' : 'Set fee'}</button></td>`
+                                                    ? `<td><button class="link" onclick="${ledger ? `recordPayment('${s[0]}')` : `setStudentFee('${s[0]}')`}">${ledger ? 'Record payment' : 'Set fee'}</button>${ledger ? `<button class="link danger-link" onclick="deleteStudentFee('${s[0]}')">Delete fee</button>` : ''}</td>`
                                                     : ''
                                             }
                                         </tr>
@@ -1014,7 +1014,7 @@ if (!session) {
                                         </div>
                                         ${
                                             isAdmin
-                                                ? `<button class="link" onclick="removeNotice('${n.id}')">Remove</button>`
+                                                ? `<button class="link" onclick="removeNotice('${n.id}')">Delete</button>`
                                                 : ''
                                         }
                                     </div>
@@ -1679,7 +1679,7 @@ if (!session) {
         };
     };
 
-    window.studentProfile = id => {
+    window.deleteStudent=async id=>{const student=students.find(item=>item[0]===id);if(!student||!isAdmin||!window.confirm('Permanently delete '+student[1]+'? Attendance, scores, fees, and family links will also be deleted. Payment records prevent deletion.'))return;const {error}=await window.ignisSupabase.client.from('students').delete().eq('id',id);if(error){toast('Student could not be deleted: '+error.message);return;}students=students.filter(item=>item[0]!==id);delete scores[id];delete fees[id];Object.keys(classRegister).forEach(key=>{if(classRegister[key])delete classRegister[key][id];});Object.keys(assignmentSubmissions).forEach(key=>{assignmentSubmissions[key]=(assignmentSubmissions[key]||[]).filter(sid=>sid!==id);});userAccounts.forEach(account=>{if(account.wardId===id){account.wardId=undefined;account.linked_student_id=null;}});storage.set('ignis-students',students);storage.set('ignis-scores',scores);storage.set('ignis-fees',fees);storage.set('ignis-class-register',classRegister);storage.set('ignis-assignment-submissions',assignmentSubmissions);toast('Student and linked school records deleted.');render();}; window.studentProfile = id => {
         const student = students.find(s => s[0] === id);
         if (!student) return;
 
@@ -1764,7 +1764,7 @@ if (!session) {
         };
     };
 
-    window.manageTimetable = () => {
+    window.deleteClass=async id=>{const cls=classesData.find(item=>item.id===id);if(!cls||!isAdmin||!window.confirm('Delete '+cls.name+'? Its timetable and assignments will be deleted; students will remain without a class.'))return;const {error}=await window.ignisSupabase.client.from('classes').delete().eq('id',id);if(error){toast('Class could not be deleted: '+error.message);return;}students=students.map(item=>item[2]===cls.name?[item[0],item[1],'Unassigned',...item.slice(3)]:item);const removed=assignments.filter(item=>item.class===cls.name);removed.forEach(item=>delete assignmentSubmissions[item.id]);assignments=assignments.filter(item=>item.class!==cls.name);timetableData=timetableData.filter(item=>item.class_id!==id);classRegister=Object.fromEntries(Object.entries(classRegister).filter(([key])=>!key.startsWith(id+'::')));classesData=classesData.filter(item=>item.id!==id);storage.set('ignis-students',students);storage.set('ignis-classes',classesData);storage.set('ignis-assignments',assignments);storage.set('ignis-assignment-submissions',assignmentSubmissions);storage.set('ignis-timetable',timetableData);storage.set('ignis-class-register',classRegister);toast('Class deleted.');render();}; window.manageTimetable = () => {
         const availableClasses = isAdmin ? classesData : classesData.filter(cls => cls.teacherId === session.id);
         if (!availableClasses.length) { toast('No classes are assigned to your account.'); return; }
         const selectedClass = availableClasses[0];
@@ -1776,7 +1776,7 @@ if (!session) {
                 <div class="field"><label>Teacher</label><select name="teacher_user_id"><option value="">Unassigned</option>${staffMembers().map(person => `<option value="${person.user_id}">${person.name}</option>`).join('')}</select></div>
                 <button class="primary" type="submit" style="width:100%">Add period</button>
             </form>
-            <div class="audit"><b>${selectedClass.name}</b>${timetableData.filter(item => item.class_id === selectedClass.id).map(item => `<div class="flag"><span>${['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'][item.weekday]} ${item.start_time.slice(0,5)}–${item.end_time.slice(0,5)} · ${item.subject}</span><button class="link" onclick="removeTimetableEntry('${item.id}')">Remove</button></div>`).join('') || '<p>No periods added yet.</p>'}</div>`);
+            <div class="audit"><b>${selectedClass.name}</b>${timetableData.filter(item => item.class_id === selectedClass.id).map(item => `<div class="flag"><span>${['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'][item.weekday]} ${item.start_time.slice(0,5)}–${item.end_time.slice(0,5)} · ${item.subject}</span><button class="link" onclick="removeTimetableEntry('${item.id}')">Delete</button></div>`).join('') || '<p>No periods added yet.</p>'}</div>`);
         document.getElementById('timetableEntryForm').onsubmit = async event => {
             event.preventDefault();
             const data = new FormData(event.target);
@@ -1794,7 +1794,7 @@ if (!session) {
         };
     };
 
-    window.removeTimetableEntry = async id => {
+    window.removeTimetableEntry = async id => {const entry=timetableData.find(item=>item.id===id);if(!entry||!window.confirm('Delete this timetable period?'))return;
         const { error } = await window.ignisSupabase.client.from('timetable_entries').delete().eq('id', id);
         if (error) { toast(error.message || 'Timetable period could not be removed.'); return; }
         timetableData = timetableData.filter(entry => entry.id !== id);
@@ -1921,7 +1921,7 @@ if (!session) {
         };
     };
 
-    window.removeAssignment = async id => {
+    window.removeAssignment = async id => {const assignment=assignments.find(item=>item.id===id);if(!assignment||!window.confirm('Delete assignment '+assignment.title+' and its submissions?'))return;
         const { error } = await window.ignisSupabase.client.from('assignments').delete().eq('id', id);
         if (error) { toast(error.message || 'Assignment could not be removed.'); return; }
         assignments = assignments.filter(a => a.id !== id);
@@ -2037,7 +2037,7 @@ if (!session) {
        Fees
        ----------------------------------------------------- */
 
-    window.recordPayment = studentId => {
+    window.deleteScore=async(studentId,encodedSubject,encodedTerm)=>{if(!isAdmin&&!isTeacher)return;const subject=decodeURIComponent(encodedSubject);const term=decodeURIComponent(encodedTerm);if(!window.confirm('Delete the '+subject+' score'+(term?' for '+term:'')+'?'))return;const {error}=await window.ignisSupabase.client.from('scores').delete().eq('student_id',studentId).eq('subject',subject).eq('term',term);if(error){toast('Score could not be deleted: '+error.message);return;}scores[studentId]=(scores[studentId]||[]).filter(item=>!(item.subject===subject&&(item.term||'')===term));storage.set('ignis-scores',scores);toast('Score deleted.');render();}; window.recordPayment = studentId => {
         const ledger = fees[studentId];
         if (!ledger) { toast('Set a fee for this student before recording a payment.'); return; }
         openModal(`
@@ -2113,7 +2113,7 @@ if (!session) {
         };
     };
 
-    window.startMobileMoneyPayment = () => toast("Online payment is unavailable until a mobile money provider is connected.");
+    window.deleteStudentFee=async studentId=>{if(!isAdmin)return;const ledger=fees[studentId];const student=students.find(item=>item[0]===studentId);if(!ledger||!window.confirm('Delete the '+ledger.term+' fee ledger for '+(student?.[1]||studentId)+'?'))return;const {error}=await window.ignisSupabase.client.from('fees').delete().eq('student_id',studentId).eq('term',ledger.term);if(error){toast('Fee ledger could not be deleted: '+error.message);return;}delete fees[studentId];storage.set('ignis-fees',fees);toast('Fee ledger deleted.');render();}; window.startMobileMoneyPayment = () => toast("Online payment is unavailable until a mobile money provider is connected.");
 
     /* -----------------------------------------------------
        Notices
@@ -2160,7 +2160,7 @@ if (!session) {
         };
     };
 
-    window.removeNotice = async id => {
+    window.removeNotice = async id => {const notice=notices.find(item=>item.id===id);if(!notice||!isAdmin||!window.confirm('Delete notice '+notice.title+'?'))return;
         const { error } = await window.ignisSupabase.client.from('notices').delete().eq('id', id);
         if (error) { toast(error.message || 'Notice could not be removed.'); return; }
         notices = notices.filter(n => n.id !== id);
