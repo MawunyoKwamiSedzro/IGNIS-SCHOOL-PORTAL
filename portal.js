@@ -1473,7 +1473,17 @@ if (!session) {
                     const { data, error } = await window.ignisSupabase.client.functions.invoke('clock-in', { body: { latitude, longitude } });
                     if (error || data?.error) {
                         clockInPending = false;
-                        toast(data?.error || error?.context?.message || error?.message || 'Check-in failed. Confirm the attendance service and approved school zone.');
+                        let reason = data?.error;
+                        if (!reason && error?.context) {
+                            try {
+                                const response = error.context.clone ? error.context.clone() : error.context;
+                                const details = typeof response.json === 'function' ? await response.json() : response;
+                                reason = details?.error || details?.message;
+                            } catch (_) {
+                                // Keep the SDK message if the response body is unavailable or already consumed.
+                            }
+                        }
+                        toast(reason || error?.message || 'Check-in failed. Confirm the attendance service and approved school zone.');
                         return;
                     }
                     const record = { email: session.email, name: session.name, time: Date.parse(data.recorded_at), lat: latitude, lng: longitude, zoneName: data.zone_name, distance: data.distance_meters, radius: data.radius_meters || geofences.find(zone => zone.name === data.zone_name)?.radius, verified: true };
