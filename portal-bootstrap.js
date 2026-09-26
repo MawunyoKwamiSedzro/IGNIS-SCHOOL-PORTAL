@@ -19,32 +19,75 @@
             .eq('user_id', user.id)
             .single();
         if (profileError || !profile) throw new Error('Your account has no IGNIS school profile. Ask the school administrator to finish account setup.');
-        if (!profile.is_active) throw new Error('This account is disabled. Contact the school administrator.'); const cacheRecord = JSON.parse(sessionStorage.getItem('ignis-portal-cache') || 'null'); const cachedSession = JSON.parse(sessionStorage.getItem('ignis-session') || 'null'); if (cacheRecord?.userId === user.id && cachedSession?.id === user.id && Date.now() - cacheRecord.savedAt < 20000 && localStorage.getItem('ignis-students') && localStorage.getItem('ignis-classes')) { const cachedScript = document.createElement('script'); cachedScript.src = 'portal.js?v=20260925-1930'; cachedScript.onerror = () => { document.body.innerHTML = '<p>IGNIS could not load. Refresh the page or contact support.</p>'; }; document.body.append(cachedScript); return; }
+        if (!profile.is_active) throw new Error('This account is disabled. Contact the school administrator.');
 
-        let directory = [];
-        if (['Headteacher', 'Manager'].includes(profile.role)) {
-            const { data, error } = await client.from('profiles').select('user_id, email, full_name, role, linked_student_id, is_active').order('full_name');
-            if (error) throw error;
-            directory = data || [];
-            sessionStorage.setItem('ignis-user-directory', JSON.stringify(directory));
+        const cacheRecord = JSON.parse(sessionStorage.getItem('ignis-portal-cache') || 'null');
+        const cachedSession = JSON.parse(sessionStorage.getItem('ignis-session') || 'null');
+        if (cacheRecord?.userId === user.id && cachedSession?.id === user.id && Date.now() - cacheRecord.savedAt < 120000 && localStorage.getItem('ignis-students') && localStorage.getItem('ignis-classes')) {
+            cachedSession.email = user.email;
+            cachedSession.name = profile.full_name;
+            cachedSession.role = profile.role;
+            cachedSession.wardId = profile.linked_student_id || undefined;
+            cachedSession.initials = profile.full_name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0].toUpperCase()).join('');
+            sessionStorage.setItem('ignis-session', JSON.stringify(cachedSession));
+            const cachedScript = document.createElement('script');
+            cachedScript.src = 'portal.js?v=20260926-1';
+            cachedScript.onerror = () => { document.body.innerHTML = '<p>IGNIS could not load. Refresh the page or contact support.</p>'; };
+            document.body.append(cachedScript);
+            return;
         }
 
-        const { data: classRows, error: classesError } = await client.from('classes').select('id, name, level, teacher_user_id').order('name');
-        if (classesError) throw classesError;
-        const { data: zoneRows, error: zonesError } = await client.from('geofences').select('id, name, latitude, longitude, radius_meters').eq('enabled', true);
-        if (zonesError) throw zonesError;
+        const admin = ['Headteacher', 'Manager'].includes(profile.role);
+        const [directoryResult, classesResult, zonesResult, arrivalResult, termResult, termsResult,
+            studentsResult, timetableResult, assignmentsResult, submissionsResult, scoresResult, feesResult,
+            paymentsResult, noticesResult, paymentSettingResult, staffResult, marksResult] = await Promise.all([
+            admin ? client.from('profiles').select('user_id, email, full_name, role, linked_student_id, is_active').order('full_name') : Promise.resolve({ data: [], error: null }),
+            client.from('classes').select('id, name, level, teacher_user_id').order('name'),
+            client.from('geofences').select('id, name, latitude, longitude, radius_meters').eq('enabled', true),
+            client.from('school_settings').select('setting_value').eq('setting_key', 'arrival_by').maybeSingle(),
+            client.from('school_settings').select('setting_value').eq('setting_key', 'current_term').maybeSingle(),
+            client.from('school_settings').select('setting_value').eq('setting_key', 'academic_terms').maybeSingle(),
+            client.from('students').select('id, full_name, class_id, guardian_name, guardian_phone, guardian_email, status').order('full_name'),
+            client.from('timetable_entries').select('id, class_id, weekday, start_time, end_time, subject, teacher_user_id').order('start_time'),
+            client.from('assignments').select('id, title, subject, description, class_id, due_at').order('created_at', { ascending: false }),
+            client.from('assignment_submissions').select('assignment_id, student_id'),
+            client.from('scores').select('student_id, subject, class_score, exam_score, term').order('updated_at', { ascending: false }),
+            client.from('fees').select('student_id, term, amount, paid, updated_at').order('updated_at', { ascending: false }),
+            client.from('payments').select('student_id, amount, method, reference, created_at, status').order('created_at', { ascending: false }),
+            client.from('notices').select('id, title, body, audience, published_by, published_at').order('published_at', { ascending: false }),
+            client.from('school_settings').select('setting_value').eq('setting_key', 'payment_settings').maybeSingle(),
+            client.from('staff_attendance').select('staff_user_id, attendance_date, status, recorded_at, latitude, longitude, zone_name, distance_meters'),
+            client.from('student_attendance').select('student_id, attendance_date, status, recorded_at')
+        ]);
+        const queryResults = [directoryResult, classesResult, zonesResult, arrivalResult, termResult, termsResult,
+            studentsResult, timetableResult, assignmentsResult, submissionsResult, scoresResult, feesResult,
+            paymentsResult, noticesResult, paymentSettingResult, staffResult, marksResult];
+        const failedQuery = queryResults.find(result => result.error);
+        if (failedQuery) throw failedQuery.error;
+
+        const directory = directoryResult.data || [];
+        const classRows = classesResult.data || [];
+        const zoneRows = zonesResult.data || [];
+        const arrivalSetting = arrivalResult.data;
+        const termSetting = termResult.data;
+        const termsSetting = termsResult.data;
+        const studentRows = studentsResult.data || [];
+        const timetableRows = timetableResult.data || [];
+        const assignmentRows = assignmentsResult.data || [];
+        const submissionRows = submissionsResult.data || [];
+        const scoreRows = scoresResult.data || [];
+        const feeRows = feesResult.data || [];
+        const paymentRows = paymentsResult.data || [];
+        const noticeRows = noticesResult.data || [];
+        const paymentSetting = paymentSettingResult.data;
+        const staffRows = staffResult.data || [];
+        const marks = marksResult.data || [];
+        if (admin) sessionStorage.setItem('ignis-user-directory', JSON.stringify(directory));
+
         localStorage.setItem('ignis-geofences', JSON.stringify((zoneRows || []).map(zone => ({ id: zone.id, name: zone.name, lat: zone.latitude, lng: zone.longitude, radius: zone.radius_meters }))));
-        const { data: arrivalSetting } = await client.from('school_settings').select('setting_value').eq('setting_key', 'arrival_by').maybeSingle();
         localStorage.setItem('ignis-attendance-policy', JSON.stringify({ arrivalBy: arrivalSetting?.setting_value?.time || '' }));
-        const { data: termSetting } = await client.from('school_settings').select('setting_value').eq('setting_key', 'current_term').maybeSingle();
         localStorage.setItem('ignis-current-term', JSON.stringify(termSetting?.setting_value?.name || 'Not configured'));
-        const { data: termsSetting, error: termsError } = await client.from('school_settings').select('setting_value').eq('setting_key', 'academic_terms').maybeSingle();
-        if (termsError) throw termsError;
         localStorage.setItem('ignis-academic-terms', JSON.stringify(Array.isArray(termsSetting?.setting_value) ? termsSetting.setting_value : []));
-        const { data: studentRows, error: studentsError } = await client.from('students')
-            .select('id, full_name, class_id, guardian_name, guardian_phone, guardian_email, status')
-            .order('full_name');
-        if (studentsError) throw studentsError;
         const teacherNames = new Map(directory.map(teacher => [teacher.user_id, teacher.full_name]));
         teacherNames.set(user.id, profile.full_name);
         const classNames = new Map((classRows || []).map(row => [row.id, row.name]));
@@ -58,23 +101,7 @@
         localStorage.setItem('ignis-students', JSON.stringify((studentRows || []).map(row => [
             row.id, row.full_name, classNames.get(row.class_id) || '', row.guardian_name || '', row.guardian_phone || '', row.guardian_email || '', row.status
         ])));
-        const { data: timetableRows, error: timetableError } = await client.from('timetable_entries')
-            .select('id, class_id, weekday, start_time, end_time, subject, teacher_user_id').order('start_time');
-        if (timetableError) throw timetableError;
         localStorage.setItem('ignis-timetable', JSON.stringify(timetableRows || []));
-
-        const [{ data: assignmentRows, error: assignmentError }, { data: submissionRows, error: submissionError },
-            { data: scoreRows, error: scoreError }, { data: feeRows, error: feeError },
-            { data: paymentRows, error: paymentError }, { data: noticeRows, error: noticeError }] = await Promise.all([
-            client.from('assignments').select('id, title, subject, description, class_id, due_at').order('created_at', { ascending: false }),
-            client.from('assignment_submissions').select('assignment_id, student_id'),
-            client.from('scores').select('student_id, subject, class_score, exam_score, term').order('updated_at', { ascending: false }),
-            client.from('fees').select('student_id, term, amount, paid, updated_at').order('updated_at', { ascending: false }),
-            client.from('payments').select('student_id, amount, method, reference, created_at, status').order('created_at', { ascending: false }),
-            client.from('notices').select('id, title, body, audience, published_by, published_at').order('published_at', { ascending: false })
-        ]);
-        const loadError = assignmentError || submissionError || scoreError || feeError || paymentError || noticeError;
-        if (loadError) throw loadError;
         const classNamesById = new Map((classRows || []).map(row => [row.id, row.name]));
         localStorage.setItem('ignis-assignments', JSON.stringify((assignmentRows || []).map(row => ({
             id: row.id, title: row.title, subject: row.subject, class: classNamesById.get(row.class_id) || '', due: row.due_at?.slice(0, 10) || '', description: row.description
@@ -94,11 +121,8 @@
         const namesById = new Map(directory.map(item => [item.user_id, item.full_name]));
         namesById.set(user.id, profile.full_name);
         localStorage.setItem('ignis-notices', JSON.stringify((noticeRows || []).map(row => ({ id: row.id, title: row.title, body: row.body, audience: row.audience, author: namesById.get(row.published_by) || 'IGNIS School', date: row.published_at.slice(0, 10) }))));
-        const { data: paymentSetting } = await client.from('school_settings').select('setting_value').eq('setting_key', 'payment_settings').maybeSingle();
         localStorage.setItem('ignis-payment-settings', JSON.stringify(paymentSetting?.setting_value || { accountName: '', mtnNumber: '', telecelNumber: '' }));
 
-        const { data: staffRows, error: staffError } = await client.from('staff_attendance').select('staff_user_id, attendance_date, status, recorded_at, latitude, longitude, zone_name, distance_meters');
-        if (staffError) throw staffError;
         const directoryById = new Map([...directory, { user_id: user.id, email: user.email, full_name: profile.full_name, role: profile.role }].map(item => [item.user_id, item]));
         const staffAttendance = {};
         const checkins = [];
@@ -116,8 +140,6 @@
         localStorage.setItem('ignis-staff-attendance', JSON.stringify(staffAttendance));
         localStorage.setItem('ignis-checkins', JSON.stringify(checkins));
 
-        const { data: marks, error: marksError } = await client.from('student_attendance').select('student_id, attendance_date, status, recorded_at');
-        if (marksError) throw marksError;
         const registers = {};
         (marks || []).forEach(mark => {
             const student = (studentRows || []).find(row => row.id === mark.student_id);
@@ -139,7 +161,7 @@
         }));
 
         sessionStorage.setItem('ignis-portal-cache', JSON.stringify({ userId: user.id, savedAt: Date.now() })); const script = document.createElement('script');
-        script.src = 'portal.js?v=20260925-1930';
+        script.src = 'portal.js?v=20260926-1';
         script.onerror = () => { document.body.innerHTML = '<p style="padding:24px;font:16px system-ui">IGNIS could not load. Refresh the page or contact support.</p>'; };
         document.body.append(script);
     } catch (error) {

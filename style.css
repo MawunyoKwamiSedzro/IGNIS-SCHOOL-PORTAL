@@ -7,9 +7,6 @@
    1. Google Fonts
    --------------------------------------------------------- */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
-
-
 /* ---------------------------------------------------------
    2. Root Variables
    --------------------------------------------------------- */
@@ -39,35 +36,74 @@ body {
     margin: 0;
     background: var(--bg);
     color: var(--ink);
-    font: 14px 'DM Sans', Arial, sans-serif;
+    font: 14px 'DM Sans', system-ui, Arial, sans-serif;
 }
 
-@view-transition {
-    navigation: auto;
+.portal-loading {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
 }
 
-::view-transition-old(root) {
-    animation: portal-page-out 140ms ease both;
+.portal-loading-card {
+    width: min(360px, 100%);
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: var(--shadow);
 }
 
-::view-transition-new(root) {
-    animation: portal-page-in 220ms ease both;
+.portal-loading-mark {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 18px;
+    border-radius: 13px 13px 13px 4px;
+    background: var(--green);
+    color: #fff;
+    font: 700 24px Georgia, serif;
 }
 
-@keyframes portal-page-out {
-    to { opacity: 0; }
+.portal-loading-title,
+.portal-loading-message {
+    display: block;
 }
 
-@keyframes portal-page-in {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
+.portal-loading-title {
+    font-size: 16px;
+    font-weight: 700;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    ::view-transition-old(root),
-    ::view-transition-new(root) {
-        animation-duration: 1ms;
-    }
+.portal-loading-message {
+    margin-top: 6px;
+    color: var(--muted);
+}
+
+.portal-loading-track {
+    height: 3px;
+    display: block;
+    overflow: hidden;
+    margin-top: 22px;
+    border-radius: 99px;
+    background: #eaf0ee;
+}
+
+.portal-loading-track::after {
+    width: 38%;
+    height: 100%;
+    display: block;
+    border-radius: inherit;
+    background: var(--green);
+    content: '';
+    animation: portal-loading-progress 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes portal-loading-progress {
+    from { transform: translateX(0); }
+    to { transform: translateX(165%); }
 }
 
 button,
@@ -116,7 +152,7 @@ textarea:focus-visible {
     display: grid;
     place-items: center;
     background: var(--gold);
-    font: 700 28px 'Playfair Display';
+    font: 700 28px Georgia, 'Times New Roman', serif;
     clip-path: polygon(
         50% 0,
         100% 14%,
@@ -142,7 +178,7 @@ textarea:focus-visible {
 }
 
 .login-brand h1 {
-    font: 700 47px/1.12 'Playfair Display';
+    font: 700 47px/1.12 Georgia, 'Times New Roman', serif;
     margin: 0 0 18px;
 }
 
@@ -191,7 +227,7 @@ textarea:focus-visible {
 }
 
 .login-card h2 {
-    font: 700 30px 'Playfair Display';
+    font: 700 30px Georgia, 'Times New Roman', serif;
     margin: 0 0 8px;
 }
 
@@ -376,11 +412,11 @@ textarea:focus-visible {
         0 72%,
         0 14%
     );
-    font: 700 21px 'Playfair Display';
+    font: 700 21px Georgia, 'Times New Roman', serif;
 }
 
 .brand strong {
-    font: 700 20px 'Playfair Display';
+    font: 700 20px Georgia, 'Times New Roman', serif;
     letter-spacing: 2px;
 }
 
@@ -610,7 +646,7 @@ main {
 }
 
 .page-head h1 {
-    font: 700 29px 'Playfair Display';
+    font: 700 29px Georgia, 'Times New Roman', serif;
     margin: 0;
 }
 
@@ -878,7 +914,7 @@ td {
 }
 
 .modal h2 {
-    font: 700 23px 'Playfair Display';
+    font: 700 23px Georgia, 'Times New Roman', serif;
     margin: 0 0 9px;
 }
 
@@ -958,7 +994,7 @@ td {
 }
 
 .attendance-callout h2 {
-    font: 700 22px 'Playfair Display';
+    font: 700 22px Georgia, 'Times New Roman', serif;
     margin: 0 0 7px;
 }
 
@@ -995,7 +1031,7 @@ td {
 }
 
 .ward-hero h2 {
-    font: 700 22px 'Playfair Display';
+    font: 700 22px Georgia, 'Times New Roman', serif;
     margin: 0 0 7px;
 }
 
@@ -1026,7 +1062,7 @@ td {
 
 .payment-card-copy h2 {
     margin: 0 0 7px;
-    font: 700 21px 'Playfair Display';
+    font: 700 21px Georgia, 'Times New Roman', serif;
 }
 
 .payment-card-copy > p:last-child,
@@ -1148,7 +1184,7 @@ td {
 .checkout-header { display: flex; align-items: center; gap: 10px; }
 .checkout-header h2 { margin: 0; }
 .checkout-header .eyebrow { margin-bottom: 3px; }
-.checkout-total { margin: 20px 0 3px; font: 700 32px 'Playfair Display'; }
+.checkout-total { margin: 20px 0 3px; font: 700 32px Georgia, 'Times New Roman', serif; }
 .payment-consent { display: flex; gap: 8px; align-items: flex-start; color: var(--muted); font-size: 11px; }
 .payment-consent input { width: auto; margin-top: 2px; }
 
@@ -1272,7 +1308,7 @@ td {
 }
 
 .class-register .section-title h2 {
-    font: 700 20px 'Playfair Display';
+    font: 700 20px Georgia, 'Times New Roman', serif;
 }
 
 .attendance-select {
