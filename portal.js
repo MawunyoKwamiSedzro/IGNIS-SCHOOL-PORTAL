@@ -1287,7 +1287,7 @@ if (!session) {
     window.showHelp = () => {
         openModal(`
             <h2 id="modalTitle">Help & support</h2>
-            <p>For account assistance, contact the IGNIS school office directly.</p>
+            <p>For school or account assistance, email <a href="mailto:ignisschoolgh@gmail.com">ignisschoolgh@gmail.com</a>.</p>
             <div class="help-shortcuts">
                 <span><kbd>Ctrl</kbd> + <kbd>K</kbd> Search the portal</span>
                 <span><kbd>Esc</kbd> Close a window</span>
