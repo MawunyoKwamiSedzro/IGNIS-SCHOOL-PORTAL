@@ -23,15 +23,16 @@
 
         const cacheRecord = JSON.parse(sessionStorage.getItem('ignis-portal-cache') || 'null');
         const cachedSession = JSON.parse(sessionStorage.getItem('ignis-session') || 'null');
-        if (cacheRecord?.userId === user.id && cachedSession?.id === user.id && Date.now() - cacheRecord.savedAt < 120000 && localStorage.getItem('ignis-students') && localStorage.getItem('ignis-classes')) {
+        const linkedStudentId = profile.linked_student_id || undefined;
+        if (cacheRecord?.userId === user.id && cachedSession?.id === user.id && cachedSession.role === profile.role && cachedSession.wardId === linkedStudentId && Date.now() - cacheRecord.savedAt < 120000 && localStorage.getItem('ignis-students') && localStorage.getItem('ignis-classes')) {
             cachedSession.email = user.email;
             cachedSession.name = profile.full_name;
             cachedSession.role = profile.role;
-            cachedSession.wardId = profile.linked_student_id || undefined;
+            cachedSession.wardId = linkedStudentId;
             cachedSession.initials = profile.full_name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0].toUpperCase()).join('');
             sessionStorage.setItem('ignis-session', JSON.stringify(cachedSession));
             const cachedScript = document.createElement('script');
-            cachedScript.src = 'portal.js?v=20260926-2';
+            cachedScript.src = 'portal.js?v=20260926-3';
             cachedScript.onerror = () => { document.body.innerHTML = '<p>IGNIS could not load. Refresh the page or contact support.</p>'; };
             document.body.append(cachedScript);
             return;
@@ -161,7 +162,7 @@
         }));
 
         sessionStorage.setItem('ignis-portal-cache', JSON.stringify({ userId: user.id, savedAt: Date.now() })); const script = document.createElement('script');
-        script.src = 'portal.js?v=20260926-2';
+        script.src = 'portal.js?v=20260926-3';
         script.onerror = () => { document.body.innerHTML = '<p style="padding:24px;font:16px system-ui">IGNIS could not load. Refresh the page or contact support.</p>'; };
         document.body.append(script);
     } catch (error) {

@@ -71,6 +71,14 @@ if (!session) {
             localStorage.setItem(key, JSON.stringify(value))
     };
 
+    const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]);
+    const jsStringArg = value => JSON.stringify(String(value ?? ''))
+        .replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026')
+        .replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+    const htmlAttribute = value => escapeHtml(value);
+
     let students = storage.get(
         'ignis-students',
         []
@@ -265,13 +273,13 @@ if (!session) {
             .map(
                 student => `
                     <tr>
-                        <td>${student[0]}</td>
+                        <td>${escapeHtml(student[0])}</td>
 
                         <td>
-                            <b>${student[1]}</b>
+                            <b>${escapeHtml(student[1])}</b>
                         </td>
 
-                        <td>${student[2]}</td>
+                        <td>${escapeHtml(student[2])}</td>
 
                         <td>
                             <span class="pill green">
@@ -279,12 +287,12 @@ if (!session) {
                             </span>
                         </td>
 
-                        <td><b>${student[3]}</b><small class="subline">${student[4] || 'Phone not recorded'}${student[5] ? ` · ${student[5]}` : ''}</small></td>
+                        <td><b>${escapeHtml(student[3])}</b><small class="subline">${escapeHtml(student[4] || 'Phone not recorded')}${student[5] ? ` · ${escapeHtml(student[5])}` : ''}</small></td>
 
                         <td>
                             <button
                                 class="link"
-                                onclick="studentProfile('${student[0]}')"
+                                onclick="studentProfile(${htmlAttribute(jsStringArg(student[0]))})"
                             >
                                 View
                             </button>
@@ -318,7 +326,7 @@ if (!session) {
             <div class="table-wrap"><table><thead><tr><th>Staff member</th><th>Role</th><th>Recorded time</th><th>Status</th></tr></thead><tbody>
                 ${members.map(member => {
                     const record = records[member.email];
-                    return `<tr><td><b>${member.name}</b><small class="subline">${member.email}</small></td><td>${member.role}</td><td>${record ? new Date(record.recordedAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : '—'}</td><td><span class="pill ${record ? (record.status === 'late' ? 'amber' : 'green') : 'red'}">${record ? (record.status === 'late' ? 'Late' : 'Present') : 'Not recorded'}</span></td></tr>`;
+                    return `<tr><td><b>${escapeHtml(member.name)}</b><small class="subline">${escapeHtml(member.email)}</small></td><td>${escapeHtml(member.role)}</td><td>${record ? new Date(record.recordedAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : '—'}</td><td><span class="pill ${record ? (record.status === 'late' ? 'amber' : 'green') : 'red'}">${record ? (record.status === 'late' ? 'Late' : 'Present') : 'Not recorded'}</span></td></tr>`;
                 }).join('')}
             </tbody></table></div>
         `;
@@ -701,7 +709,7 @@ if (!session) {
                                     </div>
                                     <div class="class-roster-preview">
                                         ${students.filter(s => s[2] === c.name).length
-                                            ? students.filter(s => s[2] === c.name).map(s => `<button class="link roster-link" onclick="studentProfile('${s[0]}')"><b>${s[1]}</b><small>${s[0]} · ${s[3]}</small></button>`).join('')
+                                            ? students.filter(s => s[2] === c.name).map(s => `<button class="link roster-link" onclick="studentProfile(${htmlAttribute(jsStringArg(s[0]))})"><b>${escapeHtml(s[1])}</b><small>${escapeHtml(s[0])} · ${escapeHtml(s[3])}</small></button>`).join('')
                                             : '<small class="subline">No students enrolled yet.</small>'}
                                     </div>
                                     ${(isTeacher || isAdmin) ? `<button class="secondary" onclick="openRegister('${c.id}')">${isAdmin ? 'View daily register' : 'Open daily register'}</button>` : ''}${isAdmin ? `<button class="link danger-link" onclick="deleteClass('${c.id}')">Delete class</button>` : ''}
@@ -1024,13 +1032,13 @@ if (!session) {
                                     <div class="flag">
                                         <span class="flag-icon">✉</span>
                                         <div>
-                                            <b>${n.title}</b>
-                                            <small>${n.author} · ${formatDate(n.date)} · ${n.audience}</small>
-                                            <p style="margin:6px 0 0">${n.body}</p>
+                                            <b>${escapeHtml(n.title)}</b>
+                                            <small>${escapeHtml(n.author)} · ${formatDate(n.date)} · ${escapeHtml(n.audience)}</small>
+                                            <p style="margin:6px 0 0">${escapeHtml(n.body)}</p>
                                         </div>
                                         ${
                                             isAdmin
-                                                ? `<button class="link" onclick="removeNotice('${n.id}')">Delete</button>`
+                                                ? `<button class="link" onclick="removeNotice(${htmlAttribute(jsStringArg(n.id))})">Delete</button>`
                                                 : ''
                                         }
                                     </div>
@@ -1067,15 +1075,15 @@ if (!session) {
                             ${accountDirectory()
                                 .map(a => `
                                         <tr>
-                                            <td><b>${a.name}</b></td>
-                                            <td>${a.email}</td>
-                                            <td>${a.role}</td>
-                                            <td>${a.wardId ? (students.find(student => student[0] === a.wardId) || [a.wardId, a.wardId])[1] : '—'}</td>
+                                            <td><b>${escapeHtml(a.name)}</b></td>
+                                            <td>${escapeHtml(a.email)}</td>
+                                            <td>${escapeHtml(a.role)}</td>
+                                            <td>${escapeHtml(a.wardId ? (students.find(student => student[0] === a.wardId) || [a.wardId, a.wardId])[1] : '—')}</td>
                                             <td><span class="pill ${a.is_active ? 'green' : 'red'}">${a.is_active ? 'Active' : 'Disabled'}</span></td>
                                             <td>
-                                                <button class="link" onclick="editUserAccount('${a.email}')">Edit</button>
-                                                <button class="link" onclick="resetUserPassword('${a.email}')">Reset password</button>
-                                                <button class="link" onclick="toggleUserStatus('${a.user_id}', ${!a.is_active})">${a.is_active ? 'Disable' : 'Enable'}</button> <button class="link danger-link" onclick="deleteUserAccount('${a.user_id}', '${a.email}')">Delete</button>
+                                                <button class="link" onclick="editUserAccount(${htmlAttribute(jsStringArg(a.email))})">Edit</button>
+                                                <button class="link" onclick="resetUserPassword(${htmlAttribute(jsStringArg(a.email))})">Reset password</button>
+                                                <button class="link" onclick="toggleUserStatus(${htmlAttribute(jsStringArg(a.user_id))}, ${!a.is_active})">${a.is_active ? 'Disable' : 'Enable'}</button> <button class="link danger-link" onclick="deleteUserAccount(${htmlAttribute(jsStringArg(a.user_id))}, ${htmlAttribute(jsStringArg(a.email))})">Delete</button>
                                             </td>
                                         </tr>
                                     `)
@@ -1316,7 +1324,7 @@ if (!session) {
                 .sort((a, b) => Number(b.title.toLocaleLowerCase().startsWith(query)) - Number(a.title.toLocaleLowerCase().startsWith(query)))
                 .slice(0, 12);
             results.innerHTML = matches.length ? matches.map((item, index) => `
-                <button class="quick-result" type="button" data-index="${index}"><b>${item.title}</b><small>${item.note}</small></button>
+                <button class="quick-result" type="button" data-index="${index}"><b>${escapeHtml(item.title)}</b><small>${escapeHtml(item.note)}</small></button>
             `).join('') : '<div class="empty">No matching records found.</div>';
             results.querySelectorAll('[data-index]').forEach(button => {
                 button.onclick = () => {
@@ -1451,13 +1459,21 @@ if (!session) {
     };
 
     function downloadCsv(filename, rows) {
-        const csv = rows.map(row => row.map(value => `"${String(value ?? '').replace(/"/g, '""')}"`).join(',')).join('\r\n');
+        const csvCell = value => {
+            let text = String(value ?? '');
+            if (/^[\s\u0000-\u001f]*[=+@-]/.test(text)) text = `'${text}`;
+            return `"${text.replace(/"/g, '""')}"`;
+        };
+        const csv = '\uFEFF' + rows.map(row => row.map(csvCell).join(',')).join('\r\n');
         const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
         const link = document.createElement('a');
         link.href = url;
         link.download = filename;
+        link.hidden = true;
+        document.body.append(link);
         link.click();
-        URL.revokeObjectURL(url);
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
     window.exportStaffAttendance = () => {
