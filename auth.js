@@ -15,10 +15,12 @@ if (!window.ignisSupabase?.client) {
 }
 
 togglePassword.addEventListener('click', () => {
-    passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
-    togglePassword.textContent = passwordInput.type === 'password' ? 'Show' : 'Hide';
+    const isHidden = passwordInput.type === 'password';
+    passwordInput.type = isHidden ? 'text' : 'password';
+    togglePassword.textContent = isHidden ? 'Hide' : 'Show';
+    togglePassword.setAttribute('aria-pressed', String(isHidden));
+    togglePassword.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
 });
-
 form.addEventListener('submit', async event => {
     event.preventDefault();
     loginError.textContent = '';
@@ -77,5 +79,10 @@ forgotPassword.addEventListener('click', async () => {
     }
     const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/IGNIS-SCHOOL-PORTAL/reset-password.html` });
     if (error) showError(error.message);
-    else showError('If that address belongs to an account, password reset instructions have been sent.');
+    else showError('If that address belongs to an account, password reset instructions have been sent.', true);
 });
+const showError = (message, isSuccess = false) => {
+    loginError.textContent = message;
+    loginError.classList.toggle('success', isSuccess);
+    loginError.classList.add('show');
+};
