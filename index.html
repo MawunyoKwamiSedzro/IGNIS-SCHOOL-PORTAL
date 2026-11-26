@@ -4,44 +4,74 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#102f3a">
+  <meta name="description" content="IGNIS School Portal — Secure academic, attendance, communication, and school operations workspace for Nsawam, Ghana.">
   <title>IGNIS School Portal — Sign in</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="style.css?v=20260926-2">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20261126-1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js?v=20260924-2" defer></script>
-  <script src="auth.js" defer></script>
+  <script src="auth.js?v=20261126-1" defer></script>
 </head>
 <body>
   <main class="login-wrap">
     <section class="login-brand">
-      <div class="login-crest">I</div>
+      <div class="login-crest" aria-hidden="true">I</div>
       <p class="eyebrow">IGNIS School · Nsawam, Ghana</p>
       <h1>Excellence with<br>purpose.</h1>
       <p>One secure place for learning, care, communication, and accountable school operations.</p>
       <div class="login-note">
         <b>Protected school information</b>
-        <span>Secure sign-in · School role permissions</span>
+        <span>Secure sign-in · Role-based access permissions</span>
       </div>
     </section>
+
     <section class="login-panel">
-      <form id="loginForm" class="login-card">
-        <div class="login-mobile-mark">I</div>
+      <form id="loginForm" class="login-card" novalidate>
+        <div class="login-mobile-mark" aria-hidden="true">I</div>
         <p class="eyebrow">Secure access</p>
         <h2>Welcome to IGNIS</h2>
         <p>Sign in to continue to the School Portal.</p>
+
         <label for="email">Email address</label>
-        <input id="email" name="email" type="email" placeholder="name@ignisschool.edu.gh" required>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          autocapitalize="none"
+          spellcheck="false"
+          placeholder="name@ignisschool.edu.gh"
+          required
+        >
+
         <label for="password">Password</label>
         <div class="password-field">
-          <input name="password" id="password" type="password" placeholder="Enter your password" required>
-          <button type="button" id="togglePassword">Show</button>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            required
+          >
+          <button
+            type="button"
+            id="togglePassword"
+            aria-controls="password"
+            aria-pressed="false"
+            aria-label="Show password"
+          >Show</button>
         </div>
+
         <div class="login-options">
           <button type="button" id="forgotPassword">Forgot password?</button>
         </div>
+
         <button class="primary login-button" type="submit">Sign in securely</button>
-        <p id="loginError" class="login-error" role="alert"></p>
+        <p id="loginError" class="login-error" role="alert" aria-live="polite"></p>
       </form>
     </section>
   </main>
