@@ -32,7 +32,7 @@
             cachedSession.initials = profile.full_name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0].toUpperCase()).join('');
             sessionStorage.setItem('ignis-session', JSON.stringify(cachedSession));
             const cachedScript = document.createElement('script');
-            cachedScript.src = 'portal.js?v=20260926-4';
+            cachedScript.src = 'portal.js?v=20261126-1';
             cachedScript.onerror = () => { document.body.innerHTML = '<p>IGNIS could not load. Refresh the page or contact support.</p>'; };
             document.body.append(cachedScript);
             return;
@@ -161,8 +161,9 @@
             initials: profile.full_name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0].toUpperCase()).join('')
         }));
 
-        sessionStorage.setItem('ignis-portal-cache', JSON.stringify({ userId: user.id, savedAt: Date.now() })); const script = document.createElement('script');
-        script.src = 'portal.js?v=20260926-4';
+        sessionStorage.setItem('ignis-portal-cache', JSON.stringify({ userId: user.id, savedAt: Date.now() }));
+        const script = document.createElement('script');
+        script.src = 'portal.js?v=20261126-1';
         script.onerror = () => { document.body.innerHTML = '<p style="padding:24px;font:16px system-ui">IGNIS could not load. Refresh the page or contact support.</p>'; };
         document.body.append(script);
     } catch (error) {
