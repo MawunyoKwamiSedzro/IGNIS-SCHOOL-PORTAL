@@ -1,7 +1,8 @@
-/* Public Supabase project settings. Never place a secret key in browser code. */
+/* Paste the new project's URL and publishable key here.
+   This file is served to every visitor. Never put a secret/service-role key here. */
 window.IGNIS_SUPABASE_CONFIG = {
-    url: 'https://fbrdwzwavtngsdhptutc.supabase.co',
-    anonKey: 'sb_publishable_4Pwm_MhR9PhszRqJv8riWw_Ym5lz5S7'
+    url: 'https://guyvqxfxxctlxstlbrqs.supabase.co',
+    anonKey: 'sb_publishable_1r535hbDrkFJvkYd_5d6wg_5XXqkrr3'
 };
 
 if (!window.IGNIS_SUPABASE_CONFIG.url || !window.IGNIS_SUPABASE_CONFIG.anonKey) {
