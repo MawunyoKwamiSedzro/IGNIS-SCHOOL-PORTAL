@@ -33,6 +33,30 @@ if (!session) {
         ['user-accounts', 'Create user account']
     ];
 
+    const navIcons = {
+        dashboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>',
+        attendance: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-6-5.33-6-10a6 6 0 1 1 12 0c0 4.67-6 10-6 10z"/><circle cx="12" cy="11" r="2.5"/></svg>',
+        students: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        classes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+        assignments: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+        scores: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+        timetable: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+        fees: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
+        'payment-settings': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+        'staff-attendance': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>',
+        announcements: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+        accounts: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+        settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+        'user-accounts': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>'
+    };
+
+    const navSections = {
+        dashboard: 'Overview',
+        students: 'Academics',
+        fees: 'Operations',
+        accounts: 'Administration'
+    };
+
     const permitted = key => {
         if (isParent) {
             return [
@@ -223,7 +247,8 @@ if (!session) {
             .slice(-1)[0];
 
     const isLateArrival = timestamp => {
-        if (!attendancePolicy.arrivalBy) return false; const [hours, minutes] = String(attendancePolicy.arrivalBy).split(':').map(Number);
+        if (!attendancePolicy.arrivalBy) return false;
+        const [hours, minutes] = String(attendancePolicy.arrivalBy).split(':').map(Number);
         const cutoff = new Date(timestamp);
         cutoff.setHours(hours, minutes, 0, 0);
         return new Date(timestamp) > cutoff;
@@ -467,7 +492,25 @@ if (!session) {
                 `;
             }
 
-            if (!isAdmin) {                const assignedClasses = classesData.filter(item => item.teacherId === session.id);                const assignedClassNames = new Set(assignedClasses.map(item => item.name));                const myAssignments = assignments.filter(item => assignedClassNames.has(item.class));                const myAttendance = staffAttendance[localDateKey()]?.[session.email];                const upcoming = myAssignments.filter(item => !item.due || item.due >= localDateKey());                return heading(`Welcome back, ${session.name.split(' ')[0]}`, 'Your teaching overview for today.') + `                    <div class="stats">                        <div class="stat"><div class="stat-top">Your attendance</div><b>${myAttendance ? (myAttendance.status === 'late' ? 'Late' : 'Present') : 'Not recorded'}</b><small>${myAttendance ? `Recorded at ${new Date(myAttendance.recordedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Complete your geofenced check-in.'}</small></div>                        <div class="stat"><div class="stat-top">Your classes</div><b>${assignedClasses.length}</b><small>Classes assigned to you</small></div>                        <div class="stat"><div class="stat-top">Your assignments</div><b>${upcoming.length}</b><small>Open coursework for your classes</small></div>                    </div>                    ${!myAttendance ? `<div class="card"><h2>Record your attendance</h2><p>Check in from an approved school location.</p>${button('Verify location', "location.href='attendance.html'")}</div>` : ''}                    <div class="card"><h2>Your classes</h2>${assignedClasses.length ? assignedClasses.map(item => `<div class="flag"><span class="flag-icon">▦</span><div><b>${item.name}</b><small>${item.level || 'Class'}</small></div></div>`).join('') : '<div class="empty">No classes are assigned to your account yet.</div>'}</div>                    <div class="card"><h2>Upcoming assignments</h2>${upcoming.length ? upcoming.map(item => `<div class="flag"><span class="flag-icon">▤</span><div><b>${item.title}</b><small>${item.subject} · ${item.class}${item.due ? ` · Due ${formatDate(item.due)}` : ''}</small></div></div>`).join('') : '<div class="empty">No open assignments for your classes.</div>'}</div>                `;            }            const summary = operationalSummary();
+            if (!isAdmin) {
+                const assignedClasses = classesData.filter(item => item.teacherId === session.id);
+                const assignedClassNames = new Set(assignedClasses.map(item => item.name));
+                const myAssignments = assignments.filter(item => assignedClassNames.has(item.class));
+                const myAttendance = staffAttendance[localDateKey()]?.[session.email];
+                const upcoming = myAssignments.filter(item => !item.due || item.due >= localDateKey());
+                return heading(`Welcome back, ${session.name.split(' ')[0]}`, 'Your teaching overview for today.') + `
+                    <div class="stats">
+                        <div class="stat"><div class="stat-top">Your attendance</div><b>${myAttendance ? (myAttendance.status === 'late' ? 'Late' : 'Present') : 'Not recorded'}</b><small>${myAttendance ? `Recorded at ${new Date(myAttendance.recordedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Complete your geofenced check-in.'}</small></div>
+                        <div class="stat"><div class="stat-top">Your classes</div><b>${assignedClasses.length}</b><small>Classes assigned to you</small></div>
+                        <div class="stat"><div class="stat-top">Your assignments</div><b>${upcoming.length}</b><small>Open coursework for your classes</small></div>
+                    </div>
+                    ${!myAttendance ? `<div class="card"><h2>Record your attendance</h2><p>Check in from an approved school location.</p>${button('Verify location', "location.href='attendance.html'")}</div>` : ''}
+                    <div class="card"><h2>Your classes</h2>${assignedClasses.length ? assignedClasses.map(item => `<div class="flag"><span class="flag-icon">▦</span><div><b>${item.name}</b><small>${item.level || 'Class'}</small></div></div>`).join('') : '<div class="empty">No classes are assigned to your account yet.</div>'}</div>
+                    <div class="card"><h2>Upcoming assignments</h2>${upcoming.length ? upcoming.map(item => `<div class="flag"><span class="flag-icon">▤</span><div><b>${item.title}</b><small>${item.subject} · ${item.class}${item.due ? ` · Due ${formatDate(item.due)}` : ''}</small></div></div>`).join('') : '<div class="empty">No open assignments for your classes.</div>'}</div>
+                `;
+            }
+
+            const summary = operationalSummary();
 
             return heading(
                 `Welcome back, ${session.name.split(' ')[0]}`,
@@ -528,6 +571,7 @@ if (!session) {
 
                         <small class="${summary.academicFlags ? 'negative' : 'positive'}">
                             ${summary.academicFlags ? 'Scores needing support' : 'No low-score flags recorded'}
+                        </small>
                     </div>
 
                 </div>
@@ -1111,13 +1155,16 @@ if (!session) {
             + `<div class="card settings-card">${userAccountForm({}, true, 'createUserAccountFromPage(event)')}</div>`
     };
 
-    const render = () => { document.body.innerHTML = `
+    const render = () => {
+        const permittedNav = nav.filter(item => permitted(item[0]));
+        document.body.innerHTML = `
         <div class="shell">
+            <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleNavigation(false)"></div>
 
-            <aside class="sidebar" id="sidebar">
+            <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
 
                 <div class="brand">
-                    <div class="crest">I</div>
+                    <div class="crest" aria-hidden="true">I</div>
 
                     <div>
                         <strong>IGNIS</strong>
@@ -1127,29 +1174,32 @@ if (!session) {
 
                 <div class="role-chip">
 
-                    <span class="status-dot"></span>
+                    <span class="status-dot" aria-hidden="true"></span>
 
                     <div>
                         <small>Signed in as</small>
-                        <b>${session.role}</b>
+                        <b>${escapeHtml(session.role)}</b>
                     </div>
 
                 </div>
 
                 <nav>
-                    ${nav
-                        .filter(item => permitted(item[0]))
+                    ${permittedNav
                         .map(
                             item => `
+                                ${navSections[item[0]] ? `<div class="nav-section">${navSections[item[0]]}</div>` : ''}
                                 <button
+                                    type="button"
                                     class="nav-item ${
                                         page === item[0]
                                             ? 'active'
                                             : ''
                                     }"
+                                    ${page === item[0] ? 'aria-current="page"' : ''}
                                     onclick="location.href='${item[0]}.html'"
                                 >
-                                    ${item[1]}
+                                    ${navIcons[item[0]] || ''}
+                                    <span>${item[1]}</span>
                                 </button>
                             `
                         )
@@ -1159,14 +1209,16 @@ if (!session) {
                 <div class="sidebar-bottom">
 
                     <button
+                        type="button"
                         class="support"
                         onclick="showHelp()"
                     >
-                        ? Help & Support
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <span>Help &amp; Support</span>
                     </button>
 
                     <small>
-                        © 2026 IGNIS School
+                        © 2026 IGNIS School · Nsawam
                     </small>
 
                 </div>
@@ -1179,39 +1231,45 @@ if (!session) {
 
                     <div class="topbar-start">
                         <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" onclick="toggleNavigation()">☰</button>
-                    <div class="crumb">
-                        <span>IGNIS School</span>
-                        <b>/</b>
+                        <div class="crumb">
+                            <span>IGNIS School</span>
+                            <b>/</b>
 
-                        <strong>
-                            ${nav.find(item => item[0] === page)?.[1]}
-                        </strong>
-                    </div>
+                            <strong>
+                                ${nav.find(item => item[0] === page)?.[1] || 'Dashboard'}
+                            </strong>
+                        </div>
                     </div>
 
                     <div class="top-actions">
 
-                        <button class="top-icon-button search-trigger" type="button" onclick="openQuickSearch()" aria-label="Search school records"><span aria-hidden="true">⌕</span><span class="search-label">Search records</span><kbd>Ctrl K</kbd></button>
+                        <button class="top-icon-button search-trigger" type="button" onclick="openQuickSearch()" aria-label="Search school records">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <span class="search-label">Search records…</span>
+                            <kbd>Ctrl K</kbd>
+                        </button>
                         <button class="top-icon-button" type="button" onclick="openNotifications()" aria-label="Open notifications">
-                            <span aria-hidden="true">♢</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                             ${notificationItems().length ? `<span class="notification-badge">${notificationItems().length > 9 ? '9+' : notificationItems().length}</span>` : ''}
                         </button>
 
                         <div class="term">
                             <div>
                                 <small>Current term</small>
-                                <b>${currentTerm}</b>
+                                <b>${escapeHtml(currentTerm)}</b>
                             </div>
                         </div>
 
                         <button
                             class="profile"
+                            type="button"
                             onclick="logout()"
+                            title="Sign out of IGNIS"
                         >
-                            <span>${session.initials}</span>
+                            <span>${escapeHtml(session.initials)}</span>
 
                             <div>
-                                <b>${session.name}</b>
+                                <b>${escapeHtml(session.name)}</b>
                                 <small>Sign out</small>
                             </div>
                         </button>
@@ -1231,16 +1289,20 @@ if (!session) {
         <div
             class="toast"
             id="toast"
+            role="status"
+            aria-live="polite"
         ></div>
 
         <div
             class="modal-backdrop"
             id="modal"
         >
-            <div class="modal" role="dialog" aria-modal="true" aria-label="Portal dialog">
+            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
 
                 <button
                     class="modal-close"
+                    type="button"
+                    aria-label="Close dialog"
                     onclick="closeModal()"
                 >
                     ×
@@ -1250,7 +1312,15 @@ if (!session) {
 
             </div>
         </div>
-    `; if (page === 'settings') { const saved = academicTerms.find(term => term.name === currentTerm); if (saved) { document.getElementById('termStartDate').value = saved.startDate || ''; document.getElementById('termEndDate').value = saved.endDate || ''; } } };
+    `;
+        if (page === 'settings') {
+            const saved = academicTerms.find(term => term.name === currentTerm);
+            if (saved) {
+                document.getElementById('termStartDate').value = saved.startDate || '';
+                document.getElementById('termEndDate').value = saved.endDate || '';
+            }
+        }
+    };
 
     render();
 
@@ -1276,10 +1346,17 @@ if (!session) {
             .classList.remove('open');
     };
 
-    window.toggleNavigation = () => {
+    window.toggleNavigation = forceState => {
         const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
         const toggle = document.querySelector('.menu-toggle');
-        const isOpen = sidebar.classList.toggle('open');
+        if (!sidebar || !toggle) return;
+        const isOpen = typeof forceState === 'boolean'
+            ? forceState
+            : !sidebar.classList.contains('open');
+        sidebar.classList.toggle('open', isOpen);
+        backdrop?.classList.toggle('open', isOpen);
+        document.body.classList.toggle('nav-open', isOpen);
         toggle.setAttribute('aria-expanded', String(isOpen));
         toggle.textContent = isOpen ? '×' : '☰';
     };
@@ -1374,7 +1451,10 @@ if (!session) {
             event.preventDefault();
             openQuickSearch();
         }
-        if (event.key === 'Escape') closeModal();
+        if (event.key === 'Escape') {
+            closeModal();
+            toggleNavigation(false);
+        }
     });
 
     window.savePaymentSettings = async event => {
@@ -1578,7 +1658,7 @@ if (!session) {
 
     window.manageGeofences = () => {
         openModal(`
-            <h2>Approved zones</h2>
+            <h2 id="modalTitle">Approved zones</h2>
             <p>Teachers must be within a zone's radius to clock in successfully.</p>
 
             <form id="zoneForm">
@@ -1737,7 +1817,7 @@ if (!session) {
 
     window.addStudent = () => {
         openModal(`
-            <h2>Enrol student</h2>
+            <h2 id="modalTitle">Enrol student</h2>
             <form id="studentForm">
                 <div class="field">
                     <label>Full name</label>
@@ -1808,7 +1888,27 @@ if (!session) {
         };
     };
 
-    window.deleteStudent=async id=>{const student=students.find(item=>item[0]===id);if(!student||!isAdmin||!window.confirm('Permanently delete '+student[1]+'? Attendance, scores, fees, and family links will also be deleted. Payment records prevent deletion.'))return;const {error}=await window.ignisSupabase.client.from('students').delete().eq('id',id);if(error){toast('Student could not be deleted: '+error.message);return;}students=students.filter(item=>item[0]!==id);delete scores[id];delete fees[id];Object.keys(classRegister).forEach(key=>{if(classRegister[key])delete classRegister[key][id];});Object.keys(assignmentSubmissions).forEach(key=>{assignmentSubmissions[key]=(assignmentSubmissions[key]||[]).filter(sid=>sid!==id);});userAccounts.forEach(account=>{if(account.wardId===id){account.wardId=undefined;account.linked_student_id=null;}});storage.set('ignis-students',students);storage.set('ignis-scores',scores);storage.set('ignis-fees',fees);storage.set('ignis-class-register',classRegister);storage.set('ignis-assignment-submissions',assignmentSubmissions);toast('Student and linked school records deleted.');render();}; window.studentProfile = id => {
+    window.deleteStudent = async id => {
+        const student = students.find(item => item[0] === id);
+        if (!student || !isAdmin || !window.confirm('Permanently delete ' + student[1] + '? Attendance, scores, fees, and family links will also be deleted. Payment records prevent deletion.')) return;
+        const { error } = await window.ignisSupabase.client.from('students').delete().eq('id', id);
+        if (error) { toast('Student could not be deleted: ' + error.message); return; }
+        students = students.filter(item => item[0] !== id);
+        delete scores[id];
+        delete fees[id];
+        Object.keys(classRegister).forEach(key => { if (classRegister[key]) delete classRegister[key][id]; });
+        Object.keys(assignmentSubmissions).forEach(key => { assignmentSubmissions[key] = (assignmentSubmissions[key] || []).filter(sid => sid !== id); });
+        userAccounts.forEach(account => { if (account.wardId === id) { account.wardId = undefined; account.linked_student_id = null; } });
+        storage.set('ignis-students', students);
+        storage.set('ignis-scores', scores);
+        storage.set('ignis-fees', fees);
+        storage.set('ignis-class-register', classRegister);
+        storage.set('ignis-assignment-submissions', assignmentSubmissions);
+        toast('Student and linked school records deleted.');
+        render();
+    };
+
+    window.studentProfile = id => {
         const student = students.find(s => s[0] === id);
         if (!student) return;
 
@@ -1816,7 +1916,7 @@ if (!session) {
         const subjectScores = scores[id] || [];
 
         openModal(`
-            <h2>${student[1]}</h2>${isAdmin ? `<button class="link danger-link" onclick="deleteStudent('${id}')">Delete student</button>` : ''}
+            <h2 id="modalTitle">${student[1]}</h2>${isAdmin ? `<button class="link danger-link" onclick="deleteStudent('${id}')">Delete student</button>` : ''}
             <p class="subline">${id} · ${student[2]}</p>
 
             <div class="field">
@@ -1854,7 +1954,7 @@ if (!session) {
 
     window.addClass = () => {
         openModal(`
-            <h2>Add class</h2>
+            <h2 id="modalTitle">Add class</h2>
             <form id="classForm">
                 <div class="field">
                     <label>Class name</label>
@@ -1893,11 +1993,33 @@ if (!session) {
         };
     };
 
-    window.deleteClass=async id=>{const cls=classesData.find(item=>item.id===id);if(!cls||!isAdmin||!window.confirm('Delete '+cls.name+'? Its timetable and assignments will be deleted; students will remain without a class.'))return;const {error}=await window.ignisSupabase.client.from('classes').delete().eq('id',id);if(error){toast('Class could not be deleted: '+error.message);return;}students=students.map(item=>item[2]===cls.name?[item[0],item[1],'Unassigned',...item.slice(3)]:item);const removed=assignments.filter(item=>item.class===cls.name);removed.forEach(item=>delete assignmentSubmissions[item.id]);assignments=assignments.filter(item=>item.class!==cls.name);timetableData=timetableData.filter(item=>item.class_id!==id);classRegister=Object.fromEntries(Object.entries(classRegister).filter(([key])=>!key.startsWith(id+'::')));classesData=classesData.filter(item=>item.id!==id);storage.set('ignis-students',students);storage.set('ignis-classes',classesData);storage.set('ignis-assignments',assignments);storage.set('ignis-assignment-submissions',assignmentSubmissions);storage.set('ignis-timetable',timetableData);storage.set('ignis-class-register',classRegister);toast('Class deleted.');render();}; window.manageTimetable = () => {
+    window.deleteClass = async id => {
+        const cls = classesData.find(item => item.id === id);
+        if (!cls || !isAdmin || !window.confirm('Delete ' + cls.name + '? Its timetable and assignments will be deleted; students will remain without a class.')) return;
+        const { error } = await window.ignisSupabase.client.from('classes').delete().eq('id', id);
+        if (error) { toast('Class could not be deleted: ' + error.message); return; }
+        students = students.map(item => item[2] === cls.name ? [item[0], item[1], 'Unassigned', ...item.slice(3)] : item);
+        const removed = assignments.filter(item => item.class === cls.name);
+        removed.forEach(item => delete assignmentSubmissions[item.id]);
+        assignments = assignments.filter(item => item.class !== cls.name);
+        timetableData = timetableData.filter(item => item.class_id !== id);
+        classRegister = Object.fromEntries(Object.entries(classRegister).filter(([key]) => !key.startsWith(id + '::')));
+        classesData = classesData.filter(item => item.id !== id);
+        storage.set('ignis-students', students);
+        storage.set('ignis-classes', classesData);
+        storage.set('ignis-assignments', assignments);
+        storage.set('ignis-assignment-submissions', assignmentSubmissions);
+        storage.set('ignis-timetable', timetableData);
+        storage.set('ignis-class-register', classRegister);
+        toast('Class deleted.');
+        render();
+    };
+
+    window.manageTimetable = () => {
         const availableClasses = isAdmin ? classesData : classesData.filter(cls => cls.teacherId === session.id);
         if (!availableClasses.length) { toast('No classes are assigned to your account.'); return; }
         const selectedClass = availableClasses[0];
-        openModal(`<h2>Manage timetable</h2><p class="subline">Add or remove published periods for a class.</p>
+        openModal(`<h2 id="modalTitle">Manage timetable</h2><p class="subline">Add or remove published periods for a class.</p>
             <form id="timetableEntryForm">
                 <div class="field"><label>Class</label><select name="class_id">${availableClasses.map(cls => `<option value="${cls.id}">${cls.name}</option>`).join('')}</select></div>
                 <div class="form-row settings-grid"><div class="field"><label>Day</label><select name="weekday"><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option></select></div><div class="field"><label>Subject</label><input name="subject" required></div></div>
@@ -1923,7 +2045,9 @@ if (!session) {
         };
     };
 
-    window.removeTimetableEntry = async id => {const entry=timetableData.find(item=>item.id===id);if(!entry||!window.confirm('Delete this timetable period?'))return;
+    window.removeTimetableEntry = async id => {
+        const entry = timetableData.find(item => item.id === id);
+        if (!entry || !window.confirm('Delete this timetable period?')) return;
         const { error } = await window.ignisSupabase.client.from('timetable_entries').delete().eq('id', id);
         if (error) { toast(error.message || 'Timetable period could not be removed.'); return; }
         timetableData = timetableData.filter(entry => entry.id !== id);
@@ -1945,7 +2069,7 @@ if (!session) {
         const presentCount = roster.filter(s => ['present', 'late'].includes(markStatus(s[0]))).length;
 
         openModal(`
-            <h2>${cls.name} — ${canMark ? 'register' : 'attendance record'}</h2>
+            <h2 id="modalTitle">${cls.name} — ${canMark ? 'register' : 'attendance record'}</h2>
             <p class="subline">${new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })} · ${canMark ? 'Select and save each student’s attendance.' : 'View-only: attendance is updated by the teacher in charge.'}</p>
             <div class="staff-report-summary"><span><b>${roster.length}</b> enrolled</span><span><b>${presentCount}</b> present / late</span><span><b>${roster.filter(s => markStatus(s[0]) === 'absent').length}</b> absent</span></div>
 
@@ -1960,7 +2084,7 @@ if (!session) {
                                         <b>${s[1]}</b>
                                         <small>${s[0]} · Guardian: ${s[3]}${s[4] ? ` · ${s[4]}` : ''}</small>
                                     </div>
-                    <select class="attendance-select" ${canMark ? `onchange="markRegister('${dayKey}','${s[0]}',this.value)"` : 'disabled'}>
+                                    <select class="attendance-select" ${canMark ? `onchange="markRegister('${dayKey}','${s[0]}',this.value)"` : 'disabled'}>
                                         <option value="" disabled ${!markStatus(s[0]) ? 'selected' : ''}>Not marked</option>
                                         <option value="present" ${markStatus(s[0]) === 'present' ? 'selected' : ''}>Present</option>
                                         <option value="absent" ${markStatus(s[0]) === 'absent' ? 'selected' : ''}>Absent</option>
@@ -2007,7 +2131,7 @@ if (!session) {
 
     window.addAssignment = () => {
         openModal(`
-            <h2>New assignment</h2>
+            <h2 id="modalTitle">New assignment</h2>
             <form id="assignmentForm">
                 <div class="field">
                     <label>Title</label>
@@ -2050,7 +2174,9 @@ if (!session) {
         };
     };
 
-    window.removeAssignment = async id => {const assignment=assignments.find(item=>item.id===id);if(!assignment||!window.confirm('Delete assignment '+assignment.title+' and its submissions?'))return;
+    window.removeAssignment = async id => {
+        const assignment = assignments.find(item => item.id === id);
+        if (!assignment || !window.confirm('Delete assignment ' + assignment.title + ' and its submissions?')) return;
         const { error } = await window.ignisSupabase.client.from('assignments').delete().eq('id', id);
         if (error) { toast(error.message || 'Assignment could not be removed.'); return; }
         assignments = assignments.filter(a => a.id !== id);
@@ -2070,7 +2196,7 @@ if (!session) {
         const missing = roster.filter(student => !submitted.has(student[0])).length;
 
         openModal(`
-            <h2>${assignment.title}</h2>
+            <h2 id="modalTitle">${assignment.title}</h2>
             <p class="subline">${assignment.class} · ${assignment.subject} · Due ${formatDate(assignment.due)}</p>
             <div class="staff-report-summary"><span><b>${roster.length}</b> assigned</span><span><b>${submitted.size}</b> submitted</span><span><b>${missing}</b> not submitted</span></div>
             <div class="assignment-progress">
@@ -2114,7 +2240,7 @@ if (!session) {
 
     window.addScore = studentId => {
         openModal(`
-            <h2>Record score</h2>
+            <h2 id="modalTitle">Record score</h2>
             <form id="scoreForm">
                 <div class="field">
                     <label>Subject</label>
@@ -2166,11 +2292,24 @@ if (!session) {
        Fees
        ----------------------------------------------------- */
 
-    window.deleteScore=async(studentId,encodedSubject,encodedTerm)=>{if(!isAdmin&&!isTeacher)return;const subject=decodeURIComponent(encodedSubject);const term=decodeURIComponent(encodedTerm);if(!window.confirm('Delete the '+subject+' score'+(term?' for '+term:'')+'?'))return;const {error}=await window.ignisSupabase.client.from('scores').delete().eq('student_id',studentId).eq('subject',subject).eq('term',term);if(error){toast('Score could not be deleted: '+error.message);return;}scores[studentId]=(scores[studentId]||[]).filter(item=>!(item.subject===subject&&(item.term||'')===term));storage.set('ignis-scores',scores);toast('Score deleted.');render();}; window.recordPayment = studentId => {
+    window.deleteScore = async (studentId, encodedSubject, encodedTerm) => {
+        if (!isAdmin && !isTeacher) return;
+        const subject = decodeURIComponent(encodedSubject);
+        const term = decodeURIComponent(encodedTerm);
+        if (!window.confirm('Delete the ' + subject + ' score' + (term ? ' for ' + term : '') + '?')) return;
+        const { error } = await window.ignisSupabase.client.from('scores').delete().eq('student_id', studentId).eq('subject', subject).eq('term', term);
+        if (error) { toast('Score could not be deleted: ' + error.message); return; }
+        scores[studentId] = (scores[studentId] || []).filter(item => !(item.subject === subject && (item.term || '') === term));
+        storage.set('ignis-scores', scores);
+        toast('Score deleted.');
+        render();
+    };
+
+    window.recordPayment = studentId => {
         const ledger = fees[studentId];
         if (!ledger) { toast('Set a fee for this student before recording a payment.'); return; }
         openModal(`
-            <h2>Record payment</h2>
+            <h2 id="modalTitle">Record payment</h2>
             <p class="subline">${ledger.term} · Outstanding: GH₵ ${(ledger.amount - ledger.paid).toFixed(2)}</p>
             <form id="paymentForm">
                 <div class="field">
@@ -2224,7 +2363,7 @@ if (!session) {
 
     window.setStudentFee = studentId => {
         const current = fees[studentId] || {};
-        openModal(`<h2>Set student fees</h2><p class="subline">Create or update this student’s term ledger.</p><form id="feeForm"><div class="field"><label>Term</label><input name="term" value="${current.term || ''}" required></div><div class="field"><label>Amount billed (GH₵)</label><input name="amount" type="number" min="0" step="0.01" value="${current.amount ?? ''}" required></div><div class="field"><label>Already paid (GH₵)</label><input name="paid" type="number" min="0" step="0.01" value="${current.paid ?? 0}" required></div><button class="primary" type="submit" style="width:100%">Save fee ledger</button></form>`);
+        openModal(`<h2 id="modalTitle">Set student fees</h2><p class="subline">Create or update this student’s term ledger.</p><form id="feeForm"><div class="field"><label>Term</label><input name="term" value="${current.term || ''}" required></div><div class="field"><label>Amount billed (GH₵)</label><input name="amount" type="number" min="0" step="0.01" value="${current.amount ?? ''}" required></div><div class="field"><label>Already paid (GH₵)</label><input name="paid" type="number" min="0" step="0.01" value="${current.paid ?? 0}" required></div><button class="primary" type="submit" style="width:100%">Save fee ledger</button></form>`);
         document.getElementById('feeForm').onsubmit = async event => {
             event.preventDefault();
             const data = new FormData(event.target);
@@ -2242,7 +2381,20 @@ if (!session) {
         };
     };
 
-    window.deleteStudentFee=async studentId=>{if(!isAdmin)return;const ledger=fees[studentId];const student=students.find(item=>item[0]===studentId);if(!ledger||!window.confirm('Delete the '+ledger.term+' fee ledger for '+(student?.[1]||studentId)+'?'))return;const {error}=await window.ignisSupabase.client.from('fees').delete().eq('student_id',studentId).eq('term',ledger.term);if(error){toast('Fee ledger could not be deleted: '+error.message);return;}delete fees[studentId];storage.set('ignis-fees',fees);toast('Fee ledger deleted.');render();}; window.startMobileMoneyPayment = () => toast("Online payment is unavailable until a mobile money provider is connected.");
+    window.deleteStudentFee = async studentId => {
+        if (!isAdmin) return;
+        const ledger = fees[studentId];
+        const student = students.find(item => item[0] === studentId);
+        if (!ledger || !window.confirm('Delete the ' + ledger.term + ' fee ledger for ' + (student?.[1] || studentId) + '?')) return;
+        const { error } = await window.ignisSupabase.client.from('fees').delete().eq('student_id', studentId).eq('term', ledger.term);
+        if (error) { toast('Fee ledger could not be deleted: ' + error.message); return; }
+        delete fees[studentId];
+        storage.set('ignis-fees', fees);
+        toast('Fee ledger deleted.');
+        render();
+    };
+
+    window.startMobileMoneyPayment = () => toast("Online payment is unavailable until a mobile money provider is connected.");
 
     /* -----------------------------------------------------
        Notices
@@ -2250,7 +2402,7 @@ if (!session) {
 
     window.addNotice = () => {
         openModal(`
-            <h2>Post notice</h2>
+            <h2 id="modalTitle">Post notice</h2>
             <form id="noticeForm">
                 <div class="field">
                     <label>Title</label>
@@ -2289,7 +2441,9 @@ if (!session) {
         };
     };
 
-    window.removeNotice = async id => {const notice=notices.find(item=>item.id===id);if(!notice||!isAdmin||!window.confirm('Delete notice '+notice.title+'?'))return;
+    window.removeNotice = async id => {
+        const notice = notices.find(item => item.id === id);
+        if (!notice || !isAdmin || !window.confirm('Delete notice ' + notice.title + '?')) return;
         const { error } = await window.ignisSupabase.client.from('notices').delete().eq('id', id);
         if (error) { toast(error.message || 'Notice could not be removed.'); return; }
         notices = notices.filter(n => n.id !== id);
@@ -2313,7 +2467,7 @@ if (!session) {
     }
 
     function userAccountForm(account = {}, isNew = false, submitHandler = '') { return `
-        <h2>${isNew ? 'Add user account' : 'Edit user account'}</h2>
+        <h2 id="modalTitle">${isNew ? 'Add user account' : 'Edit user account'}</h2>
         <p class="subline">${isNew ? 'Invite a teacher, parent, or student by email.' : 'Update this user’s school profile and family link.'}</p>
         <form id="userAccountForm" ${submitHandler ? `onsubmit="${submitHandler}"` : ''}>
             <div class="field"><label>Full name</label><input name="name" value="${account.name || ''}" required></div>
@@ -2331,7 +2485,8 @@ if (!session) {
         const data = new FormData(event.target);
         const email = String(data.get('email')).trim().toLowerCase();
         const role = String(data.get('role'));
-        let wardId = String(data.get('wardId') || ''); const studentClassId = String(data.get('studentClassId') || '');
+        let wardId = String(data.get('wardId') || '');
+        const studentClassId = String(data.get('studentClassId') || '');
         if (['Parent', 'Parent / Student'].includes(role) && !students.some(student => student[0] === wardId)) {
             toast('Select the student this parent or student account should be linked to.');
             return;
@@ -2358,10 +2513,30 @@ if (!session) {
                 sessionStorage.setItem('ignis-session', JSON.stringify(session));
             }
         } else {
-            let newStudentRecord=null;if(role==='Student'&&!wardId){const studentClass=classesData.find(item=>item.id===studentClassId);if(!studentClass){toast('Choose a class to enrol this new student.');return;}wardId='IG-'+Date.now().toString().slice(-7);const {data:savedStudent,error:studentError}=await client.from('students').insert({id:wardId,full_name:fullName,class_id:studentClass.id}).select('id,full_name,class_id').single();if(studentError){toast('Student record could not be created: '+studentError.message);return;}newStudentRecord=savedStudent;students.push([savedStudent.id,savedStudent.full_name,studentClass.name,'','','']);storage.set('ignis-students',students);} const { data: created, error } = await client.functions.invoke('create-user', {
+            let newStudentRecord = null;
+            if (role === 'Student' && !wardId) {
+                const studentClass = classesData.find(item => item.id === studentClassId);
+                if (!studentClass) { toast('Choose a class to enrol this new student.'); return; }
+                wardId = 'IG-' + Date.now().toString().slice(-7);
+                const { data: savedStudent, error: studentError } = await client.from('students').insert({ id: wardId, full_name: fullName, class_id: studentClass.id }).select('id,full_name,class_id').single();
+                if (studentError) { toast('Student record could not be created: ' + studentError.message); return; }
+                newStudentRecord = savedStudent;
+                students.push([savedStudent.id, savedStudent.full_name, studentClass.name, '', '', '']);
+                storage.set('ignis-students', students);
+            }
+            const { data: created, error } = await client.functions.invoke('create-user', {
                 body: { email, full_name: fullName, role, linked_student_id: wardId || null }
             });
-            if (error || created?.error) { if(newStudentRecord){const {error:rollbackError}=await client.from('students').delete().eq('id',newStudentRecord.id);if(rollbackError){toast('Invitation failed; student cleanup failed: '+rollbackError.message);return;}students=students.filter(student=>student[0]!==newStudentRecord.id);storage.set('ignis-students',students);} toast(created?.error || error?.message || 'Invitation could not be sent.'); return; }
+            if (error || created?.error) {
+                if (newStudentRecord) {
+                    const { error: rollbackError } = await client.from('students').delete().eq('id', newStudentRecord.id);
+                    if (rollbackError) { toast('Invitation failed; student cleanup failed: ' + rollbackError.message); return; }
+                    students = students.filter(student => student[0] !== newStudentRecord.id);
+                    storage.set('ignis-students', students);
+                }
+                toast(created?.error || error?.message || 'Invitation could not be sent.');
+                return;
+            }
             userAccounts.push({ user_id: created.user_id, email, name: fullName, full_name: fullName, role, wardId: wardId || undefined, linked_student_id: wardId || null, is_active: true });
         }
         sessionStorage.setItem('ignis-user-directory', JSON.stringify(userAccounts.map(account => ({
@@ -2375,7 +2550,8 @@ if (!session) {
     window.createUserAccountFromPage = event => saveUserAccount(event);
 
     window.addUserAccount = async () => {
-        await window.refreshLinkedStudents(); openModal(userAccountForm({}, true));
+        await window.refreshLinkedStudents();
+        openModal(userAccountForm({}, true));
         document.getElementById('userAccountForm').onsubmit = event => saveUserAccount(event);
     };
 
@@ -2383,14 +2559,21 @@ if (!session) {
         const select = document.querySelector('select[name="wardId"]');
         if (!select && !window.ignisSupabase?.client) return;
         const selectedId = select?.value || '';
-        const client=window.ignisSupabase.client; const [sr,cr]=await Promise.all([client.from('students').select('id, full_name, class_id').order('full_name'),client.from('classes').select('id, name')]); if(sr.error||cr.error){toast('Student list could not be loaded: '+(sr.error||cr.error).message);return;} const names=new Map((cr.data||[]).map(c=>[c.id,c.name])); students=(sr.data||[]).map(s=>[String(s.id),s.full_name,names.get(s.class_id)||'']); storage.set('ignis-students',students); if(select) select.innerHTML=linkedStudentOptions(selectedId);
+        const client = window.ignisSupabase.client;
+        const [sr, cr] = await Promise.all([client.from('students').select('id, full_name, class_id').order('full_name'), client.from('classes').select('id, name')]);
+        if (sr.error || cr.error) { toast('Student list could not be loaded: ' + (sr.error || cr.error).message); return; }
+        const names = new Map((cr.data || []).map(c => [c.id, c.name]));
+        students = (sr.data || []).map(s => [String(s.id), s.full_name, names.get(s.class_id) || '']);
+        storage.set('ignis-students', students);
+        if (select) select.innerHTML = linkedStudentOptions(selectedId);
         toast('Student list refreshed from Supabase.');
     };
 
     window.editUserAccount = async email => {
         const account = accountDirectory().find(item => item.email === email);
         if (!account) return;
-        await window.refreshLinkedStudents(); openModal(userAccountForm(account));
+        await window.refreshLinkedStudents();
+        openModal(userAccountForm(account));
         document.getElementById('userAccountForm').onsubmit = event => saveUserAccount(event, email);
     };
 
@@ -2406,45 +2589,60 @@ if (!session) {
         render();
     };
 
-    window.deleteUserAccount = async (userId, email) => { if (userId === session.id) { toast('You cannot delete your own account.'); return; } if (!window.confirm('Permanently delete the IGNIS account for ' + email + '?')) return; const { data, error } = await window.ignisSupabase.client.functions.invoke('set-user-status', { body: { user_id: userId, delete_user: true } }); if (error || data?.error) { toast(data?.error || error?.message || 'Account could not be deleted.'); return; } userAccounts = userAccounts.filter(account => account.user_id !== userId); sessionStorage.setItem('ignis-user-directory', JSON.stringify(userAccounts.map(account => ({ user_id: account.user_id, email: account.email, full_name: account.name, role: account.role, linked_student_id: account.wardId || null, is_active: account.is_active })))); toast('Portal account deleted.'); render(); }; if (page === 'user-accounts') setTimeout(() => window.refreshLinkedStudents(), 0); window.resetUserPassword = async email => {
+    window.deleteUserAccount = async (userId, email) => {
+        if (userId === session.id) { toast('You cannot delete your own account.'); return; }
+        if (!window.confirm('Permanently delete the IGNIS account for ' + email + '?')) return;
+        const { data, error } = await window.ignisSupabase.client.functions.invoke('set-user-status', { body: { user_id: userId, delete_user: true } });
+        if (error || data?.error) { toast(data?.error || error?.message || 'Account could not be deleted.'); return; }
+        userAccounts = userAccounts.filter(account => account.user_id !== userId);
+        sessionStorage.setItem('ignis-user-directory', JSON.stringify(userAccounts.map(account => ({ user_id: account.user_id, email: account.email, full_name: account.name, role: account.role, linked_student_id: account.wardId || null, is_active: account.is_active }))));
+        toast('Portal account deleted.');
+        render();
+    };
+
+    if (page === 'user-accounts') setTimeout(() => window.refreshLinkedStudents(), 0);
+
+    window.resetUserPassword = async email => {
         const { error } = await window.ignisSupabase.client.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/IGNIS-SCHOOL-PORTAL/reset-password.html` });
         toast(error ? error.message : `Password reset email sent to ${email}.`);
     };
 }
-    function attachPageSearch() {
-        const currentPage = document.body.dataset.page || 'dashboard';
-        const listTargets = {
-            classes: ['.class-card', 'Search classes, teachers, or students'],
-            assignments: ['.assignment', 'Search assignments, classes, or subjects'],
-            scores: ['.table-card', 'Search students, classes, or subjects'],
-            timetable: ['.table-wrap tbody tr', 'Search timetable periods, subjects, or teachers'],
-            fees: ['.table-card tbody tr', 'Search students, classes, or fee status'],
-            'staff-attendance': ['#staffReportTable tbody tr', 'Search staff attendance records'],
-            attendance: ['.table-card tbody tr', 'Search attendance records'],
-            announcements: ['.card > .flag', 'Search notices or message text']
-        };
-        const config = listTargets[currentPage];
-        const content = document.querySelector('.content');
-        const firstTarget = config && content?.querySelector(config[0]);
-        if (!firstTarget || content.querySelector('.page-list-search')) return;
-        const search = document.createElement('div');
-        search.className = 'search-box page-list-search';
-        search.innerHTML = '<input type="search" aria-label="Search this list" placeholder="' + config[1] + '"><button class="secondary" type="button">Search</button>';
-        const input = search.querySelector('input');
-        const filter = () => {
-            const query = input.value.trim().toLocaleLowerCase();
-            content.querySelectorAll(config[0]).forEach(item => {
-                item.hidden = Boolean(query) && !item.textContent.toLocaleLowerCase().includes(query);
-            });
-        };
-        input.addEventListener('input', filter);
-        search.querySelector('button').addEventListener('click', filter);
-        const targetCard = firstTarget.closest('.card');
-        if (targetCard) targetCard.before(search);
-        else firstTarget.before(search);
-    }
-    const pageSearchObserver = new MutationObserver(() => {
-        if (!document.querySelector('.page-list-search')) attachPageSearch();
-    });
-    pageSearchObserver.observe(document.body, { childList: true, subtree: true });
-    attachPageSearch();
+
+function attachPageSearch() {
+    const currentPage = document.body.dataset.page || 'dashboard';
+    const listTargets = {
+        classes: ['.class-card', 'Search classes, teachers, or students'],
+        assignments: ['.assignment', 'Search assignments, classes, or subjects'],
+        scores: ['.table-card', 'Search students, classes, or subjects'],
+        timetable: ['.table-wrap tbody tr', 'Search timetable periods, subjects, or teachers'],
+        fees: ['.table-card tbody tr', 'Search students, classes, or fee status'],
+        'staff-attendance': ['#staffReportTable tbody tr', 'Search staff attendance records'],
+        attendance: ['.table-card tbody tr', 'Search attendance records'],
+        announcements: ['.card > .flag', 'Search notices or message text']
+    };
+    const config = listTargets[currentPage];
+    const content = document.querySelector('.content');
+    const firstTarget = config && content?.querySelector(config[0]);
+    if (!firstTarget || content.querySelector('.page-list-search')) return;
+    const search = document.createElement('div');
+    search.className = 'search-box page-list-search';
+    search.innerHTML = '<input type="search" aria-label="Search this list" placeholder="' + config[1] + '"><button class="secondary" type="button">Search</button>';
+    const input = search.querySelector('input');
+    const filter = () => {
+        const query = input.value.trim().toLocaleLowerCase();
+        content.querySelectorAll(config[0]).forEach(item => {
+            item.hidden = Boolean(query) && !item.textContent.toLocaleLowerCase().includes(query);
+        });
+    };
+    input.addEventListener('input', filter);
+    search.querySelector('button').addEventListener('click', filter);
+    const targetCard = firstTarget.closest('.card');
+    if (targetCard) targetCard.before(search);
+    else firstTarget.before(search);
+}
+
+const pageSearchObserver = new MutationObserver(() => {
+    if (!document.querySelector('.page-list-search')) attachPageSearch();
+});
+pageSearchObserver.observe(document.body, { childList: true, subtree: true });
+attachPageSearch();
