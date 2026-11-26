@@ -3,10 +3,18 @@ const form = document.getElementById('loginForm');
 const passwordInput = document.getElementById('password');
 const togglePassword = document.getElementById('togglePassword');
 const forgotPassword = document.getElementById('forgotPassword');
-const loginError = document.getElementById('loginError'); const authLinkType = new URLSearchParams(location.hash.slice(1)).get('type'); if (['invite', 'recovery'].includes(authLinkType)) { const resetUrl = new URL('reset-password.html', location.href); resetUrl.hash = location.hash; location.replace(resetUrl.href); }
+const loginError = document.getElementById('loginError');
 
-const showError = message => {
+const authLinkType = new URLSearchParams(location.hash.slice(1)).get('type');
+if (['invite', 'recovery'].includes(authLinkType)) {
+    const resetUrl = new URL('reset-password.html', location.href);
+    resetUrl.hash = location.hash;
+    location.replace(resetUrl.href);
+}
+
+const showError = (message, isSuccess = false) => {
     loginError.textContent = message;
+    loginError.classList.toggle('success', isSuccess);
     loginError.classList.add('show');
 };
 
@@ -21,9 +29,12 @@ togglePassword.addEventListener('click', () => {
     togglePassword.setAttribute('aria-pressed', String(isHidden));
     togglePassword.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
 });
+
 form.addEventListener('submit', async event => {
     event.preventDefault();
     loginError.textContent = '';
+    loginError.classList.remove('show', 'success');
+
     const { client, error: setupError } = window.ignisSupabase || {};
     if (!client) {
         showError(setupError || 'IGNIS is not connected to Supabase yet. Complete the setup in supabase/SETUP.md.');
@@ -81,8 +92,3 @@ forgotPassword.addEventListener('click', async () => {
     if (error) showError(error.message);
     else showError('If that address belongs to an account, password reset instructions have been sent.', true);
 });
-const showError = (message, isSuccess = false) => {
-    loginError.textContent = message;
-    loginError.classList.toggle('success', isSuccess);
-    loginError.classList.add('show');
-};
