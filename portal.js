@@ -2528,13 +2528,23 @@ if (!session) {
                 body: { email, full_name: fullName, role, linked_student_id: wardId || null }
             });
             if (error || created?.error) {
+                let reason = created?.error;
+                if (!reason && error?.context) {
+                    try {
+                        const response = error.context.clone ? error.context.clone() : error.context;
+                        const details = typeof response.json === 'function' ? await response.json() : response;
+                        reason = details?.error || details?.message;
+                    } catch (_) {
+                        // Keep the SDK message if the response body is unavailable or already consumed.
+                    }
+                }
                 if (newStudentRecord) {
                     const { error: rollbackError } = await client.from('students').delete().eq('id', newStudentRecord.id);
                     if (rollbackError) { toast('Invitation failed; student cleanup failed: ' + rollbackError.message); return; }
                     students = students.filter(student => student[0] !== newStudentRecord.id);
                     storage.set('ignis-students', students);
                 }
-                toast(created?.error || error?.message || 'Invitation could not be sent.');
+                toast(reason || error?.message || 'Invitation could not be sent.');
                 return;
             }
             userAccounts.push({ user_id: created.user_id, email, name: fullName, full_name: fullName, role, wardId: wardId || undefined, linked_student_id: wardId || null, is_active: true });
